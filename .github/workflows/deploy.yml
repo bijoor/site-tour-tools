@@ -36,7 +36,7 @@ jobs:
     - name: Build drawing tool
       run: |
         cd packages/drawing-tool
-        npm run build
+        NODE_ENV=production npm run build
 
     - name: Build tour component
       run: |
@@ -47,7 +47,7 @@ jobs:
       run: |
         cd packages/tour-component/demo
         npm ci
-        npm run build
+        NODE_ENV=production npm run build
 
     - name: Setup Pages
       if: github.ref == 'refs/heads/main'
@@ -66,22 +66,15 @@ jobs:
         mkdir -p deploy/tour-player
         cp -r packages/tour-component/demo/dist/* deploy/tour-player/
         
-        # Create index.html redirect if needed
-        if [ ! -f deploy/index.html ]; then
-          cat > deploy/index.html << 'EOF'
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <title>Site Tour Tools</title>
-          <meta http-equiv="refresh" content="0; url=./drawing-tool/">
-        </head>
-        <body>
-          <p>Redirecting to <a href="./drawing-tool/">Site Tour Tools</a>...</p>
-        </body>
-        </html>
-        EOF
-        fi
+        # List what we have for debugging
+        echo "Contents of packages/drawing-tool/dist:"
+        ls -la packages/drawing-tool/dist/ || echo "No drawing tool dist found"
+        echo "Contents of packages/tour-component/demo/dist:"
+        ls -la packages/tour-component/demo/dist/ || echo "No demo dist found"
+        
+        # Verify we have the main index.html from drawing tool
+        echo "Contents of deploy directory:"
+        ls -la deploy/
 
     - name: Upload Pages artifact
       if: github.ref == 'refs/heads/main'
