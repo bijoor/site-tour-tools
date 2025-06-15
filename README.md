@@ -20,8 +20,8 @@ An interactive toolkit for creating and displaying guided tours of images, maps,
 
 ## 🚀 Live Demo
 
-- **Drawing Tool**: [Create Tours](https://ashutoshbijoor.github.io/site-tour-tools/)
-- **Tour Player**: [View Tours](https://ashutoshbijoor.github.io/site-tour-tools/tour-player/)
+- **Drawing Tool**: [Create Tours](https://bijoor.github.io/site-tour-tools/)
+- **Tour Player**: [View Tours](https://bijoor.github.io/site-tour-tools/tour-player/)
 
 ## 📦 Project Structure
 
@@ -43,7 +43,7 @@ This is a TypeScript monorepo with three main packages:
 ### Setup
 ```bash
 # Clone the repository
-git clone https://github.com/ashutoshbijoor/site-tour-tools.git
+git clone https://github.com/bijoor/site-tour-tools.git
 cd site-tour-tools
 
 # Install dependencies for all packages
@@ -149,9 +149,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- [Live Demo](https://ashutoshbijoor.github.io/site-tour-tools/)
-- [Issues](https://github.com/ashutoshbijoor/site-tour-tools/issues)
-- [Discussions](https://github.com/ashutoshbijoor/site-tour-tools/discussions)
+- [Live Demo](https://bijoor.github.io/site-tour-tools/)
+- [Issues](https://github.com/bijoor/site-tour-tools/issues)
+- [Discussions](https://github.com/bijoor/site-tour-tools/discussions)
 
 ---
 

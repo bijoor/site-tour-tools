@@ -20,6 +20,7 @@ interface DrawingStore extends DrawingToolState {
   backgroundImage: string | null;
   backgroundDimensions: { width: number; height: number } | null;
   showPOIAssociationDialog: boolean;
+  pendingPOI: { position: Point } | null;
   
   // Actions
   setMode: (mode: 'poi' | 'path' | 'select') => void;
@@ -27,6 +28,9 @@ interface DrawingStore extends DrawingToolState {
   setBackgroundImage: (url: string | null, dimensions: { width: number; height: number } | null) => void;
   
   // POI actions
+  startPOICreation: (position: Point) => void;
+  createPOI: (label: string, description?: string, showLabel?: boolean) => void;
+  cancelPOICreation: () => void;
   addPOI: (position: Point, label: string) => void;
   updatePOI: (id: string, updates: Partial<POI>) => void;
   deletePOI: (id: string) => void;
@@ -70,6 +74,7 @@ export const useDrawingStore = create<DrawingStore>((set, get) => ({
   backgroundImage: null,
   backgroundDimensions: null,
   showPOIAssociationDialog: false,
+  pendingPOI: null,
 
   // Actions
   setMode: (mode) => set({ mode, selectedPOI: undefined, selectedPath: undefined }),
@@ -92,6 +97,46 @@ export const useDrawingStore = create<DrawingStore>((set, get) => ({
   }),
   
   // POI actions
+  startPOICreation: (position) => {
+    set({ 
+      pendingPOI: { position },
+      selectedPOI: 'pending' // Use special ID to trigger POI edit popup
+    });
+  },
+
+  createPOI: (label, description, showLabel = true) => {
+    const state = get();
+    if (!state.tourData || !state.pendingPOI) return;
+    
+    const newPOI: POI = {
+      id: generatePOIId(),
+      position: state.pendingPOI.position,
+      label,
+      description,
+      showLabel,
+      isConnected: false,
+    };
+    
+    const updatedTourData = {
+      ...state.tourData,
+      pois: [...state.tourData.pois, newPOI],
+      updatedAt: new Date().toISOString(),
+    };
+    
+    set({ 
+      tourData: updatedTourData,
+      pendingPOI: null,
+      selectedPOI: newPOI.id // Select the newly created POI
+    });
+  },
+
+  cancelPOICreation: () => {
+    set({ 
+      pendingPOI: null,
+      selectedPOI: undefined
+    });
+  },
+
   addPOI: (position, label) => {
     const state = get();
     if (!state.tourData) return;

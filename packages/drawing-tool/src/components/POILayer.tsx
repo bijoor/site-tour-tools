@@ -9,7 +9,7 @@ interface POILayerProps {
 }
 
 const POILayer: React.FC<POILayerProps> = ({ pois, mode }) => {
-  const { selectedPOI, selectPOI, deletePOI } = useDrawingStore();
+  const { selectedPOI, selectPOI } = useDrawingStore();
 
   const handlePOIClick = (poi: POI, event: React.MouseEvent) => {
     console.log('POI clicked:', {
@@ -37,7 +37,7 @@ const POILayer: React.FC<POILayerProps> = ({ pois, mode }) => {
     console.log('POI mouse leave:', poi.id);
   };
 
-  const handlePOIDoubleClick = (poi: POI, event: React.MouseEvent) => {
+  const handlePOIDoubleClick = (_poi: POI, event: React.MouseEvent) => {
     event.stopPropagation();
     // Double-click functionality removed - now handled by popup
   };
@@ -81,21 +81,23 @@ const POILayer: React.FC<POILayerProps> = ({ pois, mode }) => {
             )}
             
             {/* POI Label - positioned further away to avoid overlap */}
-            <text
-              x={poi.position.x}
-              y={poi.position.y - 20}
-              textAnchor="middle"
-              fontSize="12"
-              fill="#1f2937"
-              fontWeight="500"
-              className="pointer-events-none select-none"
-              style={{ 
-                textShadow: '1px 1px 2px rgba(255,255,255,0.8)',
-                pointerEvents: 'none'
-              }}
-            >
-              {poi.label}
-            </text>
+            {(poi.showLabel ?? true) && (
+              <text
+                x={poi.position.x}
+                y={poi.position.y - 20}
+                textAnchor="middle"
+                fontSize="12"
+                fill="#1f2937"
+                fontWeight="500"
+                className="pointer-events-none select-none"
+                style={{ 
+                  textShadow: '1px 1px 2px rgba(255,255,255,0.8)',
+                  pointerEvents: 'none'
+                }}
+              >
+                {poi.label}
+              </text>
+            )}
             
           </g>
         );

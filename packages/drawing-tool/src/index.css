@@ -78,6 +78,12 @@ body {
   }
 }
 
+/* Override react-zoom-pan-pinch fit-content styles */
+.react-transform-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* Mobile responsive styles */
 @media (max-width: 768px) {
   .canvas-container {

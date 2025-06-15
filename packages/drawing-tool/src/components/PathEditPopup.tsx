@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Route, Trash2, Save, MapPin } from 'lucide-react';
 import { useDrawingStore } from '../store/drawingStore';
-import { PathSegment } from '@site-tour-tools/shared';
 
 const PathEditPopup: React.FC = () => {
   const {

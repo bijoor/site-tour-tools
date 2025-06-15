@@ -1,4 +1,3 @@
-import React from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
 import Toolbar from './components/Toolbar';
 import Canvas from './components/Canvas';

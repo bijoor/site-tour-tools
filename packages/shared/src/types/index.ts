@@ -8,6 +8,7 @@ export interface POI {
   position: Point;
   label: string;
   description?: string;
+  showLabel?: boolean; // Whether to display label on the image
   metadata?: Record<string, any>;
   isConnected?: boolean;
 }

@@ -1,5 +1,5 @@
-import React, { useRef, useCallback, useState } from 'react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import React, { useRef, useCallback, useState, useEffect } from 'react';
+import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { useDrawingStore } from '../store/drawingStore';
 import { findNearestPOI } from '@site-tour-tools/shared';
 import { useMobileDetection } from '../hooks/useMobileDetection';
@@ -18,22 +18,44 @@ const Canvas: React.FC = () => {
     currentPath,
     isDrawing,
     snapDistance,
-    zoom,
-    pan,
-    addPOI,
+    startPOICreation,
     startPath,
     addPathPoint,
     completePath,
-    setZoom,
-    setPan,
   } = useDrawingStore();
 
   const canvasRef = useRef<HTMLDivElement>(null);
-  const { isTouchDevice, hasCoarsePointer } = useMobileDetection();
-  const [currentTransform, setCurrentTransform] = useState({ scale: 1, positionX: 0, positionY: 0 });
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const transformRef = useRef<ReactZoomPanPinchRef>(null);
+  const { isTouchDevice } = useMobileDetection();
+  const [, setCurrentTransform] = useState({ scale: 1, positionX: 0, positionY: 0 });
   const [lastClickTime, setLastClickTime] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [lastTransformTime, setLastTransformTime] = useState(0);
+
+  // Auto-fit image to viewport when image loads
+  useEffect(() => {
+    if (backgroundDimensions && transformRef.current && wrapperRef.current) {
+      // Small delay to ensure the component is fully rendered
+      setTimeout(() => {
+        if (transformRef.current && wrapperRef.current) {
+          const wrapper = wrapperRef.current;
+          const rect = wrapper.getBoundingClientRect();
+          
+          // Calculate the scale needed to fit the image in the viewport
+          const scaleX = rect.width / backgroundDimensions.width;
+          const scaleY = rect.height / backgroundDimensions.height;
+          const scale = Math.min(scaleX, scaleY) * 0.9; // 90% to leave some padding
+          
+          transformRef.current.setTransform(
+            (rect.width - backgroundDimensions.width * scale) / 2,
+            (rect.height - backgroundDimensions.height * scale) / 2,
+            scale
+          );
+        }
+      }, 100);
+    }
+  }, [backgroundDimensions]);
 
   const handleCanvasClick = useCallback((event: React.MouseEvent) => {
     if (!backgroundDimensions || !tourData) return;
@@ -86,11 +108,7 @@ const Canvas: React.FC = () => {
     });
 
     if (mode === 'poi') {
-      const defaultLabel = `POI ${tourData.pois.length + 1}`;
-      const customLabel = prompt('Enter POI name:', defaultLabel);
-      if (customLabel !== null) { // User didn't cancel
-        addPOI({ x, y }, customLabel || defaultLabel);
-      }
+      startPOICreation({ x, y });
     } else if (mode === 'path') {
       if (!isDrawing) {
         startPath({ x, y });
@@ -114,7 +132,7 @@ const Canvas: React.FC = () => {
     tourData,
     isDrawing,
     snapDistance,
-    addPOI,
+    startPOICreation,
     startPath,
     addPathPoint,
     lastClickTime,
@@ -171,12 +189,15 @@ const Canvas: React.FC = () => {
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-gray-50">
+    <div ref={wrapperRef} className="relative w-full h-full overflow-hidden bg-gray-50">
       <TransformWrapper
+        ref={transformRef}
+        key={backgroundImage}
         initialScale={1}
         minScale={0.1}
         maxScale={5}
-        centerOnInit={false}
+        centerOnInit={true}
+        centerZoomedOut={true}
         onTransformed={handleTransformChange}
         onPanningStart={handlePanningStart}
         onPanningStop={handlePanningStop}
@@ -184,21 +205,19 @@ const Canvas: React.FC = () => {
         pinch={{ disabled: !isTouchDevice }}
         doubleClick={{ disabled: true }}
         limitToBounds={false}
-        centerZoomedOut={false}
         panning={{
           disabled: false,
-          velocityEqualToMove: false,
           lockAxisX: false,
           lockAxisY: false
         }}
       >
         <TransformComponent
           wrapperClass="w-full h-full"
-          contentClass={`canvas-container ${mode}-mode`}
+          contentClass="w-full h-full"
         >
           <div
             ref={canvasRef}
-            className="relative inline-block"
+            className="relative block"
             style={{
               width: backgroundDimensions.width,
               height: backgroundDimensions.height,
@@ -208,13 +227,11 @@ const Canvas: React.FC = () => {
             <img
               src={backgroundImage}
               alt="Tour background"
-              className="block w-full h-full object-contain pointer-events-none"
+              className="block pointer-events-none"
               draggable={false}
               style={{
-                maxWidth: '100%',
-                maxHeight: '100%',
-                width: 'auto',
-                height: 'auto',
+                width: backgroundDimensions.width,
+                height: backgroundDimensions.height,
               }}
             />
 
