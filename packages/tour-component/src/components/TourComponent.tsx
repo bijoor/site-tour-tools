@@ -3,8 +3,7 @@ import { TourData, POI } from '@site-tour-tools/shared';
 import { useTourStore } from '../store/tourStore';
 import { useTourAnimation } from '../hooks/useTourAnimation';
 import TourCanvas from './TourCanvas';
-import TourControls from './TourControls';
-import POIPanel from './POIPanel';
+import TourInfoPanel from './TourInfoPanel';
 
 export interface TourComponentProps {
   tourData: TourData;
@@ -12,7 +11,8 @@ export interface TourComponentProps {
   autoStart?: boolean;
   showControls?: boolean;
   showPOILabels?: boolean;
-  showPOIPanel?: boolean;
+  showInfoPanel?: boolean;
+  enableZoomPan?: boolean;
   onTourComplete?: () => void;
   onPOIVisit?: (poi: POI) => void;
 }
@@ -21,9 +21,9 @@ const TourComponent: React.FC<TourComponentProps> = ({
   tourData,
   className = '',
   autoStart = false,
-  showControls = true,
   showPOILabels = true,
-  showPOIPanel = true,
+  showInfoPanel = true,
+  enableZoomPan = true,
   onTourComplete,
   onPOIVisit,
 }) => {
@@ -31,16 +31,34 @@ const TourComponent: React.FC<TourComponentProps> = ({
     setTourData,
     play,
     activePOI,
-    visitedPOIs,
     progress,
     isPlaying,
   } = useTourStore();
 
   const [selectedPOI, setSelectedPOI] = useState<POI | null>(null);
-  const [showPOIInfo, setShowPOIInfo] = useState(false);
+  const [showInfoPanelState, setShowInfoPanelState] = useState(true); // Always show the panel
+  const [isMobile, setIsMobile] = useState(false);
 
   // Initialize tour animation
   useTourAnimation();
+
+  // Detect mobile/desktop based on screen size and aspect ratio
+  useEffect(() => {
+    const checkLayout = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const aspectRatio = width / height;
+      
+      // Mobile layout: narrow screens or portrait orientation
+      // Desktop layout: wide screens with landscape orientation
+      setIsMobile(width <= 768 || aspectRatio < 1.2);
+    };
+    
+    checkLayout();
+    window.addEventListener('resize', checkLayout);
+    
+    return () => window.removeEventListener('resize', checkLayout);
+  }, []);
 
   // Set tour data when component mounts or tourData changes
   useEffect(() => {
@@ -65,87 +83,73 @@ const TourComponent: React.FC<TourComponentProps> = ({
       if (poi) {
         onPOIVisit?.(poi);
         
-        if (showPOIPanel) {
+        if (showInfoPanel) {
           setSelectedPOI(poi);
-          setShowPOIInfo(true);
+          setShowInfoPanelState(true);
         }
       }
     }
-  }, [activePOI, tourData.pois, onPOIVisit, showPOIPanel]);
+  }, [activePOI, tourData.pois, onPOIVisit, showInfoPanel]);
 
   const handlePOIClick = (poi: POI) => {
-    if (showPOIPanel) {
+    if (showInfoPanel) {
       setSelectedPOI(poi);
-      setShowPOIInfo(true);
+      setShowInfoPanelState(true);
     }
   };
 
-  const handleClosePOIPanel = () => {
-    setShowPOIInfo(false);
-    setSelectedPOI(null);
-  };
 
+  if (isMobile) {
+    // Mobile Layout: Canvas takes full space, panel overlays from bottom
+    return (
+      <div className={`relative bg-gray-100 rounded-lg overflow-hidden ${className}`} style={{ height: '100vh', maxHeight: '100vh' }}>
+        {/* Main tour canvas - full viewport */}
+        <div className="absolute inset-0">
+          <TourCanvas
+            className="w-full h-full"
+            showPOILabels={showPOILabels}
+            onPOIClick={handlePOIClick}
+            enableZoomPan={enableZoomPan}
+            isMobile={true}
+          />
+        </div>
+
+        {/* Combined Info Panel - Overlays from bottom */}
+        {showInfoPanel && (
+          <TourInfoPanel
+            selectedPOI={selectedPOI}
+            isVisible={showInfoPanelState}
+            isMobile={true}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Desktop Layout: Canvas on left, panel on right
   return (
-    <div className={`relative bg-gray-100 rounded-lg overflow-hidden ${className}`}>
-      {/* Main tour canvas */}
-      <div className="relative">
+    <div className={`flex bg-gray-100 rounded-lg overflow-hidden ${className}`} style={{ height: '100%' }}>
+      {/* Main tour canvas - takes remaining space */}
+      <div className="flex-1 relative">
         <TourCanvas
           className="w-full h-full"
           showPOILabels={showPOILabels}
           onPOIClick={handlePOIClick}
+          enableZoomPan={enableZoomPan}
+          isMobile={false}
         />
-        
-        {/* POI Information Panel */}
-        {showPOIPanel && (
-          <div className="absolute top-4 right-4 z-10 w-80 max-w-sm">
-            <POIPanel
-              poi={selectedPOI}
-              isVisible={showPOIInfo}
-              onClose={handleClosePOIPanel}
-            />
-          </div>
-        )}
       </div>
 
-      {/* Tour Controls */}
-      {showControls && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
-          <TourControls
-            className="w-96 max-w-sm"
-            showSpeedControl={true}
-            showVolumeControl={false}
+      {/* Combined Info Panel - Fixed on right */}
+      {showInfoPanel && (
+        <div className="flex-shrink-0 w-96 max-w-sm">
+          <TourInfoPanel
+            selectedPOI={selectedPOI}
+            isVisible={showInfoPanelState}
+            isMobile={false}
           />
         </div>
       )}
-
-      {/* Tour Progress Indicator */}
-      <div className="absolute top-4 left-4 z-10">
-        <div className="bg-black bg-opacity-50 text-white px-3 py-2 rounded-lg text-sm">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-            <span>
-              {Math.round(progress * 100)}% Complete
-            </span>
-          </div>
-          <div className="text-xs mt-1 opacity-75">
-            {visitedPOIs.length} / {tourData.pois.length} POIs visited
-          </div>
-        </div>
-      </div>
-
-      {/* Tour Title */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-        <div className="bg-white bg-opacity-90 px-4 py-2 rounded-lg shadow-lg">
-          <h2 className="text-lg font-semibold text-gray-900 text-center">
-            {tourData.name}
-          </h2>
-          {tourData.description && (
-            <p className="text-sm text-gray-600 text-center mt-1">
-              {tourData.description}
-            </p>
-          )}
-        </div>
-      </div>
     </div>
   );
 };

@@ -1,19 +1,27 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { useTourStore } from '../store/tourStore';
 import { POI } from '@site-tour-tools/shared';
+import '../styles.css';
 
 interface TourCanvasProps {
   className?: string;
   showPOILabels?: boolean;
   onPOIClick?: (poi: POI) => void;
+  enableZoomPan?: boolean;
+  isMobile?: boolean;
 }
 
 const TourCanvas: React.FC<TourCanvasProps> = ({ 
   className = '',
   showPOILabels = true,
-  onPOIClick 
+  onPOIClick,
+  enableZoomPan = true,
+  isMobile = false
 }) => {
+  const transformRef = useRef<ReactZoomPanPinchRef>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const {
     tourData,
     currentPoint,
@@ -22,6 +30,59 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
     currentSegmentIndex,
     segmentProgress,
   } = useTourStore();
+
+  // Auto-fit image to viewport when tour data loads
+  useEffect(() => {
+    if (tourData && transformRef.current && wrapperRef.current && enableZoomPan) {
+      setTimeout(() => {
+        if (transformRef.current && wrapperRef.current) {
+          const wrapper = wrapperRef.current;
+          const rect = wrapper.getBoundingClientRect();
+          
+          if (isMobile) {
+            // For mobile, reset to no transform - let CSS handle sizing
+            transformRef.current.resetTransform();
+          } else {
+            // Desktop auto-fit logic
+            const scaleX = rect.width / tourData.backgroundImage.width;
+            const scaleY = rect.height / tourData.backgroundImage.height;
+            const scale = Math.min(scaleX, scaleY);
+            
+            transformRef.current.setTransform(
+              (rect.width - tourData.backgroundImage.width * scale) / 2,
+              (rect.height - tourData.backgroundImage.height * scale) / 2,
+              scale
+            );
+          }
+        }
+      }, 100);
+    }
+  }, [tourData, enableZoomPan, isMobile]);
+
+  // Force override fit-content styles after component mounts
+  useEffect(() => {
+    if (wrapperRef.current && enableZoomPan) {
+      const forceStyles = () => {
+        const wrapper = wrapperRef.current;
+        if (wrapper) {
+          // Find all transform-related divs and force their styles
+          const transformDivs = wrapper.querySelectorAll('div[class*="transform"]');
+          transformDivs.forEach((div) => {
+            const element = div as HTMLElement;
+            element.style.width = '100%';
+            element.style.height = '100%';
+            element.style.maxWidth = '100%';
+            element.style.maxHeight = '100%';
+          });
+        }
+      };
+
+      // Apply immediately and also after a short delay
+      forceStyles();
+      setTimeout(forceStyles, 50);
+      setTimeout(forceStyles, 200);
+    }
+  }, [enableZoomPan, tourData]);
 
   if (!tourData) {
     return (
@@ -36,21 +97,33 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
 
   const { backgroundImage, pois, paths } = tourData;
 
-  return (
-    <div className={`relative overflow-hidden ${className}`}>
+  const canvasContent = (
+    <div
+      className="relative block"
+      style={isMobile ? {
+        width: '100%',
+        height: '100%',
+      } : {
+        width: backgroundImage.width,
+        height: backgroundImage.height,
+      }}
+    >
       {/* Background Image */}
       <img
         src={backgroundImage.url}
         alt="Tour background"
-        className="w-full h-full object-contain"
+        className={isMobile ? "block pointer-events-none w-full h-full object-contain" : "block pointer-events-none"}
         draggable={false}
+        style={isMobile ? {} : {
+          width: backgroundImage.width,
+          height: backgroundImage.height,
+        }}
       />
 
       {/* SVG Overlay */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none"
         viewBox={`0 0 ${backgroundImage.width} ${backgroundImage.height}`}
-        preserveAspectRatio="xMidYMid meet"
       >
         {/* Render paths */}
         <g className="paths">
@@ -210,6 +283,70 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
           </g>
         )}
       </svg>
+    </div>
+  );
+
+  if (!enableZoomPan) {
+    return (
+      <div className={`relative overflow-hidden ${className}`}>
+        <div className="w-full h-full flex items-center justify-center bg-gray-50">
+          <div
+            className="relative max-w-full max-h-full"
+            style={{
+              aspectRatio: `${backgroundImage.width} / ${backgroundImage.height}`,
+            }}
+          >
+            <div
+              style={{
+                width: backgroundImage.width,
+                height: backgroundImage.height,
+                transform: 'scale(1)',
+                transformOrigin: 'center',
+              }}
+            >
+              {canvasContent}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={wrapperRef} className={`relative overflow-hidden ${className}`}>
+      <TransformWrapper
+        ref={transformRef}
+        key={backgroundImage.url}
+        initialScale={1}
+        minScale={0.1}
+        maxScale={5}
+        centerOnInit={!isMobile}
+        centerZoomedOut={!isMobile}
+        wheel={{ disabled: false }}
+        pinch={{ disabled: false }}
+        doubleClick={{ disabled: false, mode: 'zoomIn', step: 0.7 }}
+        limitToBounds={false}
+        alignmentAnimation={{ disabled: isMobile }}
+        panning={{
+          disabled: false,
+          lockAxisX: false,
+          lockAxisY: false
+        }}
+      >
+        <TransformComponent
+          wrapperClass="w-full h-full"
+          contentClass={isMobile ? "w-full h-full flex items-start justify-center" : "w-full h-full"}
+        >
+          <div 
+            className={isMobile ? "w-full h-full" : ""}
+            style={isMobile ? {
+              aspectRatio: `${backgroundImage.width} / ${backgroundImage.height}`,
+            } : {}}
+          >
+            {canvasContent}
+          </div>
+        </TransformComponent>
+      </TransformWrapper>
     </div>
   );
 };

@@ -23,9 +23,10 @@
   },
   "dependencies": {
     "@site-tour-tools/shared": "file:../shared",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "framer-motion": "^10.16.16",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "react-zoom-pan-pinch": "^3.7.0",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
