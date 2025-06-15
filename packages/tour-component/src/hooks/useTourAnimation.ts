@@ -9,6 +9,7 @@ export const useTourAnimation = () => {
     currentSegmentIndex,
     tourData,
     updateSegmentPosition,
+    completeCurrentSegment,
     pause,
     nextSegment,
   } = useTourStore();
@@ -49,6 +50,7 @@ export const useTourAnimation = () => {
       
       if (newSegmentProgress >= 1) {
         // Segment completed
+        completeCurrentSegment(); // Mark associated POI as visited
         pause(); // Always stop at end of segment
         
         // Check if there are more segments
@@ -75,7 +77,7 @@ export const useTourAnimation = () => {
       }
       lastTimeRef.current = 0;
     };
-  }, [isPlaying, speed, segmentProgress, currentSegmentIndex, tourData, updateSegmentPosition, pause, nextSegment]);
+  }, [isPlaying, speed, segmentProgress, currentSegmentIndex, tourData, updateSegmentPosition, completeCurrentSegment, pause, nextSegment]);
 
   return {
     isAnimating: isPlaying,

@@ -39,20 +39,7 @@ const POILayer: React.FC<POILayerProps> = ({ pois, mode }) => {
 
   const handlePOIDoubleClick = (poi: POI, event: React.MouseEvent) => {
     event.stopPropagation();
-    
-    if (mode === 'select') {
-      const newLabel = prompt('Enter POI label:', poi.label);
-      if (newLabel && newLabel !== poi.label) {
-        useDrawingStore.getState().updatePOI(poi.id, { label: newLabel });
-      }
-    }
-  };
-
-  const handleDeleteClick = (poi: POI, event: React.MouseEvent) => {
-    event.stopPropagation();
-    if (confirm(`Delete POI "${poi.label}"?`)) {
-      deletePOI(poi.id);
-    }
+    // Double-click functionality removed - now handled by popup
   };
 
   return (
@@ -110,32 +97,6 @@ const POILayer: React.FC<POILayerProps> = ({ pois, mode }) => {
               {poi.label}
             </text>
             
-            {/* Delete button - only show when selected */}
-            {isSelected && (
-              <g
-                className="pointer-events-auto cursor-pointer"
-                onClick={(e) => handleDeleteClick(poi, e)}
-              >
-                <circle
-                  cx={poi.position.x + 12}
-                  cy={poi.position.y - 12}
-                  r={8}
-                  fill="#ef4444"
-                  stroke="#ffffff"
-                  strokeWidth={1}
-                />
-                <text
-                  x={poi.position.x + 12}
-                  y={poi.position.y - 8}
-                  textAnchor="middle"
-                  fontSize="10"
-                  fill="#ffffff"
-                  fontWeight="bold"
-                >
-                  ×
-                </text>
-              </g>
-            )}
           </g>
         );
       })}

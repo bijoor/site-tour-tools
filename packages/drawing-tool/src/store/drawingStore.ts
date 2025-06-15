@@ -19,6 +19,7 @@ interface DrawingStore extends DrawingToolState {
   currentPath: PathPoint[] | null;
   backgroundImage: string | null;
   backgroundDimensions: { width: number; height: number } | null;
+  showPOIAssociationDialog: boolean;
   
   // Actions
   setMode: (mode: 'poi' | 'path' | 'select') => void;
@@ -35,9 +36,15 @@ interface DrawingStore extends DrawingToolState {
   startPath: (point: Point) => void;
   addPathPoint: (point: Point, connectedPOI?: string) => void;
   completePath: () => void;
+  completePathWithPOI: (endPOI?: string) => void;
   cancelPath: () => void;
+  updatePath: (id: string, updates: Partial<PathSegment>) => void;
   deletePath: (id: string) => void;
   selectPath: (id: string | undefined) => void;
+  
+  // POI Association Dialog
+  showPOIDialog: () => void;
+  hidePOIDialog: () => void;
   
   // Canvas actions
   setZoom: (zoom: number) => void;
@@ -62,6 +69,7 @@ export const useDrawingStore = create<DrawingStore>((set, get) => ({
   currentPath: null,
   backgroundImage: null,
   backgroundDimensions: null,
+  showPOIAssociationDialog: false,
 
   // Actions
   setMode: (mode) => set({ mode, selectedPOI: undefined, selectedPath: undefined }),
@@ -185,9 +193,18 @@ export const useDrawingStore = create<DrawingStore>((set, get) => ({
     const state = get();
     if (!state.currentPath || !state.tourData || state.currentPath.length < 2) return;
     
+    // Show POI association dialog
+    set({ showPOIAssociationDialog: true });
+  },
+
+  completePathWithPOI: (endPOI) => {
+    const state = get();
+    if (!state.currentPath || !state.tourData || state.currentPath.length < 2) return;
+    
     const newPath: PathSegment = {
       id: generatePathId(),
       points: state.currentPath,
+      endPOI, // Add POI association
       color: state.tourData.settings.theme.path.color,
       width: state.tourData.settings.theme.path.width,
       style: 'solid',
@@ -212,7 +229,8 @@ export const useDrawingStore = create<DrawingStore>((set, get) => ({
     set({ 
       tourData: updatedTourData,
       currentPath: null,
-      isDrawing: false
+      isDrawing: false,
+      showPOIAssociationDialog: false,
     });
   },
   
@@ -220,6 +238,21 @@ export const useDrawingStore = create<DrawingStore>((set, get) => ({
     currentPath: null, 
     isDrawing: false 
   }),
+
+  updatePath: (id, updates) => {
+    const state = get();
+    if (!state.tourData) return;
+    
+    const updatedTourData = {
+      ...state.tourData,
+      paths: state.tourData.paths.map(path => 
+        path.id === id ? { ...path, ...updates } : path
+      ),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    set({ tourData: updatedTourData });
+  },
   
   deletePath: (id) => {
     const state = get();
@@ -261,6 +294,10 @@ export const useDrawingStore = create<DrawingStore>((set, get) => ({
   },
   
   selectPath: (id) => set({ selectedPath: id, selectedPOI: undefined }),
+  
+  // POI Association Dialog
+  showPOIDialog: () => set({ showPOIAssociationDialog: true }),
+  hidePOIDialog: () => set({ showPOIAssociationDialog: false }),
   
   // Canvas actions
   setZoom: (zoom) => {

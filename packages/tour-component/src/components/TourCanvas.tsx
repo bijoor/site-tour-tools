@@ -19,7 +19,8 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
     currentPoint,
     activePOI,
     visitedPOIs,
-    progress,
+    currentSegmentIndex,
+    segmentProgress,
   } = useTourStore();
 
   if (!tourData) {
@@ -60,8 +61,12 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
             const pathData = `M ${path.points[0].x} ${path.points[0].y} ` +
               path.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
 
-            // Calculate if this path should be highlighted based on progress
-            const isActivePath = pathIndex <= Math.floor(progress * paths.length);
+            // Only show paths that have been reached (current or previously completed)
+            const isCurrentPath = pathIndex === currentSegmentIndex;
+            const isCompletedPath = pathIndex < currentSegmentIndex;
+            const shouldShowPath = isCurrentPath || isCompletedPath;
+            
+            if (!shouldShowPath) return null; // Hide future paths
             
             return (
               <g key={path.id}>
@@ -73,11 +78,11 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  opacity={isActivePath ? 1 : 0.3}
+                  opacity={isCompletedPath ? 0.6 : 1}
                 />
                 
-                {/* Progress indicator on active path */}
-                {isActivePath && (
+                {/* Progress indicator on current path */}
+                {isCurrentPath && (
                   <motion.path
                     d={pathData}
                     stroke={tourData.settings.theme.path.activeColor}
@@ -87,9 +92,7 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
                     strokeLinejoin="round"
                     initial={{ pathLength: 0 }}
                     animate={{ 
-                      pathLength: pathIndex === Math.floor(progress * paths.length) 
-                        ? (progress * paths.length) % 1 
-                        : 1 
+                      pathLength: segmentProgress
                     }}
                     transition={{ duration: 0.1 }}
                     style={{

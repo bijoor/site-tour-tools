@@ -9,20 +9,13 @@ interface PathLayerProps {
 }
 
 const PathLayer: React.FC<PathLayerProps> = ({ paths, currentPath, isDrawing }) => {
-  const { selectedPath, selectPath, deletePath, mode } = useDrawingStore();
+  const { selectedPath, selectPath, mode } = useDrawingStore();
 
   const handlePathClick = (path: PathSegment, event: React.MouseEvent) => {
     event.stopPropagation();
     
     if (mode === 'select') {
       selectPath(selectedPath === path.id ? undefined : path.id);
-    }
-  };
-
-  const handleDeleteClick = (path: PathSegment, event: React.MouseEvent) => {
-    event.stopPropagation();
-    if (confirm('Delete this path?')) {
-      deletePath(path.id);
     }
   };
 

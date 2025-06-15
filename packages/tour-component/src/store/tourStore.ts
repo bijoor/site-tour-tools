@@ -29,6 +29,7 @@ interface TourStore extends TourPlaybackState {
   previousPOI: () => void;
   updatePosition: (progress: number) => void;
   updateSegmentPosition: (segmentProgress: number) => void;
+  completeCurrentSegment: () => void;
   visitPOI: (poiId: string) => void;
 }
 
@@ -285,6 +286,20 @@ export const useTourStore = create<TourStore>((set, get) => ({
       currentSegmentIndex: currentSegment,
       segmentProgress,
     });
+  },
+
+  completeCurrentSegment: () => {
+    const state = get();
+    if (!state.tourData) return;
+    
+    const currentPath = state.tourData.paths[state.currentSegmentIndex];
+    if (!currentPath) return;
+    
+    // Check if this segment has an associated end POI
+    if (currentPath.endPOI && !state.visitedPOIs.includes(currentPath.endPOI)) {
+      console.log('Segment completed - visiting POI:', currentPath.endPOI);
+      get().visitPOI(currentPath.endPOI);
+    }
   },
   
   visitPOI: (poiId) => {

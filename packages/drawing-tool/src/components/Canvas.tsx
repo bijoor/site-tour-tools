@@ -5,6 +5,9 @@ import { findNearestPOI } from '@site-tour-tools/shared';
 import { useMobileDetection } from '../hooks/useMobileDetection';
 import POILayer from './POILayer';
 import PathLayer from './PathLayer';
+import POIAssociationDialog from './POIAssociationDialog';
+import POIEditPopup from './POIEditPopup';
+import PathEditPopup from './PathEditPopup';
 
 const Canvas: React.FC = () => {
   const {
@@ -83,8 +86,11 @@ const Canvas: React.FC = () => {
     });
 
     if (mode === 'poi') {
-      const label = `POI ${tourData.pois.length + 1}`;
-      addPOI({ x, y }, label);
+      const defaultLabel = `POI ${tourData.pois.length + 1}`;
+      const customLabel = prompt('Enter POI name:', defaultLabel);
+      if (customLabel !== null) { // User didn't cancel
+        addPOI({ x, y }, customLabel || defaultLabel);
+      }
     } else if (mode === 'path') {
       if (!isDrawing) {
         startPath({ x, y });
@@ -266,6 +272,13 @@ const Canvas: React.FC = () => {
           Click to place a POI
         </div>
       )}
+
+      {/* POI Association Dialog */}
+      <POIAssociationDialog />
+
+      {/* Edit Popups */}
+      <POIEditPopup />
+      <PathEditPopup />
     </div>
   );
 };
