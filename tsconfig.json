@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@site-tour-tools/shared": ["./packages/shared/src"],
+      "@site-tour-tools/drawing-tool": ["./packages/drawing-tool/src"],
+      "@site-tour-tools/tour-component": ["./packages/tour-component/src"]
+    }
+  },
+  "include": ["packages/*/src/**/*"],
+  "references": [
+    { "path": "./packages/shared" },
+    { "path": "./packages/drawing-tool" },
+    { "path": "./packages/tour-component" }
+  ]
+}
