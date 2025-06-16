@@ -1,0 +1,117 @@
+{
+  "id": "warehouse-navigation",
+  "name": "Warehouse Navigation Tour",
+  "description": "Navigate through a warehouse facility with auto-follow camera demonstrating pan and zoom transitions",
+  "backgroundImage": {
+    "url": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI4MDAiIHZpZXdCb3g9IjAgMCAxMjAwIDgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8IS0tIFdhcmVob3VzZSBCYWNrZ3JvdW5kIC0tPgogIDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjgwMCIgZmlsbD0iI2Y4ZjlmYSIvPgogIAogIDwhLS0gRmxvb3IgR3JpZCAtLT4KICA8ZGVmcz4KICAgIDxwYXR0ZXJuIGlkPSJncmlkIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPgogICAgICA8cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTVlN2ViIiBzdHJva2Utd2lkdGg9IjEiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iODAwIiBmaWxsPSJ1cmwoI2dyaWQpIi8+CiAgCiAgPCEtLSBXYXJlaG91c2UgU2hlbHZlcyAtLT4KICA8IS0tIFJvdyAxIC0tPgogIDxyZWN0IHg9IjEwMCIgeT0iMTAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjNjM2NjcxIiBzdHJva2U9IiMzNzQxNTEiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxyZWN0IHg9IjQwMCIgeT0iMTAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjNjM2NjcxIiBzdHJva2U9IiMzNzQxNTEiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxyZWN0IHg9IjcwMCIgeT0iMTAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjNjM2NjcxIiBzdHJva2U9IiMzNzQxNTEiIHN0cm9rZS13aWR0aD0iMiIvPgogIAogIDwhLS0gUm93IDIgLS0+CiAgPHJlY3QgeD0iMTAwIiB5PSIzMDAiIHdpZHRoPSIyMDAiIGhlaWdodD0iODAiIGZpbGw9IiM2MzY2NzEiIHN0cm9rZT0iIzM3NDE1MSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHJlY3QgeD0iNDAwIiB5PSIzMDAiIHdpZHRoPSIyMDAiIGhlaWdodD0iODAiIGZpbGw9IiM2MzY2NzEiIHN0cm9rZT0iIzM3NDE1MSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHJlY3QgeD0iNzAwIiB5PSIzMDAiIHdpZHRoPSIyMDAiIGhlaWdodD0iODAiIGZpbGw9IiM2MzY2NzEiIHN0cm9rZT0iIzM3NDE1MSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgCiAgPCEtLSBSb3cgMyAtLT4KICA8cmVjdCB4PSIxMDAiIHk9IjUwMCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI4MCIgZmlsbD0iIzYzNjY3MSIgc3Ryb2tlPSIjMzc0MTUxIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cmVjdCB4PSI0MDAiIHk9IjUwMCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI4MCIgZmlsbD0iIzYzNjY3MSIgc3Ryb2tlPSIjMzc0MTUxIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cmVjdCB4PSI3MDAiIHk9IjUwMCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSI4MCIgZmlsbD0iIzYzNjY3MSIgc3Ryb2tlPSIjMzc0MTUxIiBzdHJva2Utd2lkdGg9IjIiLz4KICAKICA8IS0tIEVudHJhbmNlIC0tPgogIDxyZWN0IHg9IjUwIiB5PSI2ODQiIHdpZHRoPSIxMDAiIGhlaWdodD0iNDAiIGZpbGw9IiMzNGQ0MDIiIHN0cm9rZT0iIzE2OWU2NCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMTAwIiB5PSI3MDgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+RU5UUkFOQ0U8L3RleHQ+CiAgCiAgPCEtLSBPZmZpY2UgQXJlYSAtLT4KICA8cmVjdCB4PSI5NTAiIHk9IjEwMCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxNTAiIGZpbGw9IiNmM2Y0ZjYiIHN0cm9rZT0iIzM3NDE1MSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMTA1MCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMzNzQxNTEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk9GRklDRTwvdGV4dD4KICAKICA8IS0tIExvYWRpbmcgRG9jayAtLT4KICA8cmVjdCB4PSI5NTAiIHk9IjU1MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNmZjc0NzQiIHN0cm9rZT0iI2RjMjYyNiIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iMTA1MCIgeT0iNjA1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkxPQURJTkcgRE9DSzwvdGV4dD4KICAKICA8IS0tIEFpc2xlIE1hcmtpbmdzIC0tPgogIDx0ZXh0IHg9IjUwIiB5PSIyMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzM3NDE1MSIgZm9udC13ZWlnaHQ9ImJvbGQiPkFJU0xFIDE8L3RleHQ+CiAgPHRleHQgeD0iNTAiIHk9IjQwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4IiBmaWxsPSIjMzc0MTUxIiBmb250LXdlaWdodD0iYm9sZCI+QUlTTEUgMjwvdGV4dD4KICA8dGV4dCB4PSI1MCIgeT0iNjAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMzNzQxNTEiIGZvbnQtd2VpZ2h0PSJib2xkIj5BSVNMRSAzPC90ZXh0PgogIAogIDwhLS0gRmlyZSBFeGl0cyAtLT4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjQwIiByPSIyMCIgZmlsbD0iI2VmNDQ0NCIvPgogIDx0ZXh0IHg9IjUwIiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5GSVJFIEVYSVQ8L3RleHQ+CiAgPGNpcmNsZSBjeD0iMTE1MCIgY3k9IjQwIiByPSIyMCIgZmlsbD0iI2VmNDQ0NCIvPgogIDx0ZXh0IHg9IjExNTAiIHk9IjQ1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZJUkUgRVhJVDwvdGV4dD4KPC9zdmc+",
+    "width": 1200,
+    "height": 800
+  },
+  "pois": [
+    {
+      "id": "entrance",
+      "position": { "x": 100, "y": 704 },
+      "label": "Main Entrance",
+      "description": "Starting point - main warehouse entrance where all tours begin",
+      "isConnected": true
+    },
+    {
+      "id": "aisle1-a",
+      "position": { "x": 200, "y": 140 },
+      "label": "Aisle 1A",
+      "description": "Electronics and consumer goods storage area",
+      "isConnected": true
+    },
+    {
+      "id": "aisle2-b", 
+      "position": { "x": 500, "y": 340 },
+      "label": "Aisle 2B",
+      "description": "Clothing and textile inventory section",
+      "isConnected": true
+    },
+    {
+      "id": "office",
+      "position": { "x": 1050, "y": 175 },
+      "label": "Office Area",
+      "description": "Management office and administrative center",
+      "isConnected": true
+    },
+    {
+      "id": "loading-dock",
+      "position": { "x": 1050, "y": 600 },
+      "label": "Loading Dock",
+      "description": "Shipping and receiving area for inventory management",
+      "isConnected": true
+    }
+  ],
+  "paths": [
+    {
+      "id": "entrance-to-aisle1",
+      "points": [
+        { "id": "p1", "x": 100, "y": 704, "timestamp": 0 },
+        { "id": "p2", "x": 100, "y": 500, "timestamp": 1000 },
+        { "id": "p3", "x": 150, "y": 200, "timestamp": 2000 },
+        { "id": "p4", "x": 200, "y": 140, "timestamp": 3000 }
+      ],
+      "color": "#3b82f6",
+      "width": 4,
+      "style": "solid"
+    },
+    {
+      "id": "aisle1-to-aisle2",
+      "points": [
+        { "id": "p5", "x": 200, "y": 140, "timestamp": 0 },
+        { "id": "p6", "x": 350, "y": 200, "timestamp": 1000 },
+        { "id": "p7", "x": 450, "y": 280, "timestamp": 2000 },
+        { "id": "p8", "x": 500, "y": 340, "timestamp": 3000 }
+      ],
+      "color": "#10b981",
+      "width": 4,
+      "style": "solid"
+    },
+    {
+      "id": "aisle2-to-office",
+      "points": [
+        { "id": "p9", "x": 500, "y": 340, "timestamp": 0 },
+        { "id": "p10", "x": 650, "y": 280, "timestamp": 1000 },
+        { "id": "p11", "x": 850, "y": 200, "timestamp": 2000 },
+        { "id": "p12", "x": 1050, "y": 175, "timestamp": 3000 }
+      ],
+      "color": "#f59e0b",
+      "width": 4,
+      "style": "solid"
+    },
+    {
+      "id": "office-to-loading",
+      "points": [
+        { "id": "p13", "x": 1050, "y": 175, "timestamp": 0 },
+        { "id": "p14", "x": 1050, "y": 350, "timestamp": 1500 },
+        { "id": "p15", "x": 1050, "y": 500, "timestamp": 2500 },
+        { "id": "p16", "x": 1050, "y": 600, "timestamp": 3500 }
+      ],
+      "color": "#ef4444",
+      "width": 4,
+      "style": "solid"
+    }
+  ],
+  "settings": {
+    "autoStart": false,
+    "speed": 1,
+    "theme": {
+      "poi": {
+        "color": "#3b82f6",
+        "selectedColor": "#1d4ed8",
+        "size": 8
+      },
+      "path": {
+        "color": "#6b7280",
+        "activeColor": "#3b82f6",
+        "width": 3
+      },
+      "text": "#374151",
+      "accent": "#3b82f6"
+    }
+  },
+  "createdAt": "2025-06-16T04:59:00.000Z",
+  "updatedAt": "2025-06-16T04:59:00.000Z"
+}

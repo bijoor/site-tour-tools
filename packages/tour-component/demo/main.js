@@ -32,7 +32,10 @@ function TourDemo() {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch(`https://bijoor.github.io/site-tour-tools/examples/${exampleName}.json`);
+            // Use path that works for both local dev and production
+            const baseUrl = window.location.pathname.includes('/site-tour-tools/tour-player/') ? 
+                '/site-tour-tools/tour-player' : '';
+            const response = await fetch(`${baseUrl}/examples/${exampleName}.json`);
             if (!response.ok) {
                 throw new Error(`Failed to load example: ${response.statusText}`);
             }
