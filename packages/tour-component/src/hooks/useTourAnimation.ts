@@ -56,7 +56,18 @@ export const useTourAnimation = () => {
       
       const newSegmentProgress = Math.min(segmentProgress + progressIncrement, 1);
       
+      // Update segment progress
       updateSegmentPosition(newSegmentProgress);
+      
+      // Calculate and update overall progress (without interfering with segment state)
+      const totalSegments = tourData.paths.length;
+      const completedSegments = currentSegmentIndex;
+      const currentSegmentContribution = newSegmentProgress / totalSegments;
+      const completedSegmentsContribution = completedSegments / totalSegments;
+      const overallProgress = completedSegmentsContribution + currentSegmentContribution;
+      
+      // Update only the overall progress without calling updatePosition
+      useTourStore.setState({ progress: overallProgress });
       
       if (newSegmentProgress >= 1) {
         // Segment completed

@@ -6,6 +6,8 @@ import './src/style.css';
 function TourDemo() {
     const [tourData, setTourData] = useState(null);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [autoFollow, setAutoFollow] = useState(true);
     
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -24,6 +26,25 @@ function TourDemo() {
             }
         };
         reader.readAsText(file);
+    };
+    
+    const loadExample = async (exampleName) => {
+        setLoading(true);
+        setError('');
+        try {
+            const response = await fetch(`https://bijoor.github.io/site-tour-tools/examples/${exampleName}.json`);
+            if (!response.ok) {
+                throw new Error(`Failed to load example: ${response.statusText}`);
+            }
+            const data = await response.json();
+            console.log('Loaded example tour:', data);
+            setTourData(data);
+        } catch (err) {
+            setError(`Failed to load example: ${err.message}`);
+            console.error('Error loading example:', err);
+        } finally {
+            setLoading(false);
+        }
     };
     
     const sampleTourData = {
@@ -106,7 +127,7 @@ function TourDemo() {
                 React.createElement('p', { 
                     key: 'desc',
                     className: "text-gray-600 mb-4" 
-                }, 'Upload a tour JSON file exported from the drawing tool, or try the sample tour.'),
+                }, 'Upload a tour JSON file exported from the drawing tool, try example tours, or use the basic sample.'),
                 React.createElement('div', { 
                     key: 'controls',
                     className: "space-y-4" 
@@ -127,11 +148,46 @@ function TourDemo() {
                             className: "mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                         })
                     ]),
+                    
+                    // Examples section
+                    React.createElement('div', {
+                        key: 'examples-section',
+                        className: "border-t pt-4"
+                    }, [
+                        React.createElement('h3', {
+                            key: 'examples-title',
+                            className: "text-sm font-medium text-gray-700 mb-2"
+                        }, 'Example Tours (Auto-Follow Demos):'),
+                        React.createElement('div', {
+                            key: 'examples-grid',
+                            className: "grid grid-cols-1 gap-2"
+                        }, [
+                            React.createElement('button', {
+                                key: 'warehouse-btn',
+                                onClick: () => loadExample('warehouse-navigation'),
+                                disabled: loading,
+                                className: "px-3 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 disabled:opacity-50"
+                            }, loading ? 'Loading...' : 'Warehouse Navigation'),
+                            React.createElement('button', {
+                                key: 'apartments-btn', 
+                                onClick: () => loadExample('apartments-tour'),
+                                disabled: loading,
+                                className: "px-3 py-2 bg-purple-500 text-white rounded text-sm hover:bg-purple-600 disabled:opacity-50"
+                            }, loading ? 'Loading...' : 'Apartments Tour'),
+                            React.createElement('button', {
+                                key: 'zoo-btn',
+                                onClick: () => loadExample('zoo-tour'),
+                                disabled: loading,
+                                className: "px-3 py-2 bg-green-500 text-white rounded text-sm hover:bg-green-600 disabled:opacity-50"
+                            }, loading ? 'Loading...' : 'Zoo Tour')
+                        ])
+                    ]),
+                    
                     React.createElement('button', {
                         key: 'sample-btn',
                         onClick: () => setTourData(sampleTourData),
                         className: "w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                    }, 'Try Sample Tour'),
+                    }, 'Try Basic Sample Tour'),
                     error && React.createElement('div', { 
                         key: 'error',
                         className: "text-red-600 text-sm" 
@@ -150,11 +206,32 @@ function TourDemo() {
                 key: 'tour-title',
                 className: "text-xl font-bold" 
             }, `Tour: ${tourData.name}`),
-            React.createElement('button', {
-                key: 'back-btn',
-                onClick: () => setTourData(null),
-                className: "px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-            }, 'Load Different Tour')
+            React.createElement('div', {
+                key: 'controls-section',
+                className: "flex items-center gap-4"
+            }, [
+                React.createElement('label', {
+                    key: 'auto-follow-label',
+                    className: "flex items-center gap-2 text-sm"
+                }, [
+                    React.createElement('input', {
+                        key: 'auto-follow-checkbox',
+                        type: 'checkbox',
+                        checked: autoFollow,
+                        onChange: (e) => setAutoFollow(e.target.checked),
+                        className: "rounded"
+                    }),
+                    React.createElement('span', {
+                        key: 'auto-follow-text',
+                        className: "text-gray-700"
+                    }, 'Auto-Follow Camera')
+                ]),
+                React.createElement('button', {
+                    key: 'back-btn',
+                    onClick: () => setTourData(null),
+                    className: "px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                }, 'Load Different Tour')
+            ])
         ]),
         React.createElement('div', { 
             key: 'tour-wrapper',
@@ -169,7 +246,7 @@ function TourDemo() {
                 showPOILabels: true,
                 showInfoPanel: true,
                 enableZoomPan: true,
-                autoFollow: true,
+                autoFollow: autoFollow,
                 onTourComplete: () => console.log('Tour completed!'),
                 onPOIVisit: (poi) => console.log('Visited POI:', poi.label)
             })

@@ -109,11 +109,16 @@ export const useTourStore = create<TourStore>((set, get) => ({
     
     console.log('⏭️ TOUR STORE: nextSegment() - advancing from segment', state.currentSegmentIndex, 'to', nextIndex);
     
+    // Calculate overall progress for the new segment start
+    const totalSegments = state.tourData.paths.length;
+    const overallProgress = nextIndex / totalSegments;
+    
     set({
       currentSegmentIndex: nextIndex,
       segmentProgress: 0,
       currentPoint: nextPath.points[0],
       isPlaying: false, // Stop at the beginning of new segment
+      progress: overallProgress, // Update overall progress
     });
   },
   
@@ -124,11 +129,16 @@ export const useTourStore = create<TourStore>((set, get) => ({
     const prevIndex = state.currentSegmentIndex - 1;
     const prevPath = state.tourData.paths[prevIndex];
     
+    // Calculate overall progress for the previous segment start
+    const totalSegments = state.tourData.paths.length;
+    const overallProgress = prevIndex / totalSegments;
+    
     set({
       currentSegmentIndex: prevIndex,
       segmentProgress: 0,
       currentPoint: prevPath.points[0],
       isPlaying: false, // Stop at the beginning of segment
+      progress: overallProgress, // Update overall progress
     });
   },
   
