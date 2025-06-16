@@ -60,6 +60,17 @@ function TourDemo() {
                 color: '#3b82f6',
                 width: 3,
                 style: 'solid'
+            },
+            {
+                id: 'path-2',
+                points: [
+                    { id: 'p4', x: 600, y: 300, timestamp: 0 },
+                    { id: 'p5', x: 400, y: 450, timestamp: 1000 },
+                    { id: 'p6', x: 100, y: 500, timestamp: 2000 }
+                ],
+                color: '#ef4444',
+                width: 3,
+                style: 'solid'
             }
         ],
         settings: {
@@ -156,7 +167,9 @@ function TourDemo() {
                 autoStart: false,
                 showControls: true,
                 showPOILabels: true,
-                showPOIPanel: true,
+                showInfoPanel: true,
+                enableZoomPan: true,
+                autoFollow: true,
                 onTourComplete: () => console.log('Tour completed!'),
                 onPOIVisit: (poi) => console.log('Visited POI:', poi.label)
             })

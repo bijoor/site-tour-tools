@@ -13,6 +13,7 @@ export interface TourComponentProps {
   showPOILabels?: boolean;
   showInfoPanel?: boolean;
   enableZoomPan?: boolean;
+  autoFollow?: boolean;
   onTourComplete?: () => void;
   onPOIVisit?: (poi: POI) => void;
 }
@@ -24,6 +25,7 @@ const TourComponent: React.FC<TourComponentProps> = ({
   showPOILabels = true,
   showInfoPanel = true,
   enableZoomPan = true,
+  autoFollow = true,
   onTourComplete,
   onPOIVisit,
 }) => {
@@ -110,6 +112,7 @@ const TourComponent: React.FC<TourComponentProps> = ({
             showPOILabels={showPOILabels}
             onPOIClick={handlePOIClick}
             enableZoomPan={enableZoomPan}
+            autoFollow={autoFollow}
             isMobile={true}
           />
         </div>
@@ -136,6 +139,7 @@ const TourComponent: React.FC<TourComponentProps> = ({
           showPOILabels={showPOILabels}
           onPOIClick={handlePOIClick}
           enableZoomPan={enableZoomPan}
+          autoFollow={autoFollow}
           isMobile={false}
         />
       </div>

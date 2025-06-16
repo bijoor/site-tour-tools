@@ -11,6 +11,7 @@ interface TourCanvasProps {
   onPOIClick?: (poi: POI) => void;
   enableZoomPan?: boolean;
   isMobile?: boolean;
+  autoFollow?: boolean;
 }
 
 const TourCanvas: React.FC<TourCanvasProps> = ({ 
@@ -18,7 +19,8 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
   showPOILabels = true,
   onPOIClick,
   enableZoomPan = true,
-  isMobile = false
+  isMobile = false,
+  autoFollow = true
 }) => {
   const transformRef = useRef<ReactZoomPanPinchRef>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,217 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
       }, 100);
     }
   }, [tourData, enableZoomPan, isMobile]);
+
+  // Auto-follow current path segment when tour starts or segment changes
+  const lastSegmentRef = useRef<number>(-1);
+  
+  // Debug effect to track currentSegmentIndex changes
+  useEffect(() => {
+    console.log('📊 SEGMENT TRACKER: currentSegmentIndex changed to', currentSegmentIndex);
+  }, [currentSegmentIndex]);
+  
+  useEffect(() => {
+    console.log('🎯 AUTO-FOLLOW: Effect triggered:', {
+      hasTourData: !!tourData,
+      hasTransformRef: !!transformRef.current,
+      hasWrapperRef: !!wrapperRef.current,
+      enableZoomPan,
+      autoFollow,
+      pathsLength: tourData?.paths?.length || 0,
+      currentSegmentIndex,
+      lastSegmentIndex: lastSegmentRef.current
+    });
+    
+    if (
+      tourData && 
+      transformRef.current && 
+      wrapperRef.current && 
+      enableZoomPan && 
+      autoFollow &&
+      tourData.paths.length > 0
+    ) {
+      const currentPath = tourData.paths[currentSegmentIndex];
+      if (!currentPath || currentPath.points.length < 2) {
+        console.log('🙅 AUTO-FOLLOW: No valid path found for segment', currentSegmentIndex);
+        return;
+      }
+
+      const isNewSegment = lastSegmentRef.current !== currentSegmentIndex;
+      
+      console.log('🔄 AUTO-FOLLOW: Segment check:', {
+        currentSegmentIndex,
+        lastSegmentIndex: lastSegmentRef.current,
+        isNewSegment
+      });
+      
+      // Only reframe on new segments, not during continuous progress
+      if (!isNewSegment) {
+        console.log('⏭️ AUTO-FOLLOW: Skipping - same segment as before');
+        return;
+      }
+      
+      console.log('🎥 AUTO-FOLLOW: NEW SEGMENT DETECTED! Following segment', currentSegmentIndex);
+      lastSegmentRef.current = currentSegmentIndex;
+
+      // Quick transform application with fallback
+      const applyAutoFollow = () => {
+        console.log('🎥 AUTO-FOLLOW: Starting quick transform application...');
+        
+        if (!transformRef.current || !wrapperRef.current) {
+          console.log('🎥 AUTO-FOLLOW: Missing refs - aborting');
+          return;
+        }
+
+        const wrapper = wrapperRef.current;
+        const rect = wrapper.getBoundingClientRect();
+        
+        // Enhanced mobile detection
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const windowAspectRatio = windowWidth / windowHeight;
+        const isActuallyMobile = windowWidth <= 768 || windowAspectRatio < 1.2;
+        
+        console.log('🎥 AUTO-FOLLOW: Mobile detection details:', {
+          windowSize: { width: windowWidth, height: windowHeight },
+          windowAspectRatio,
+          isMobileProp: isMobile,
+          isActuallyMobile,
+          rectSize: { width: rect.width, height: rect.height }
+        });
+        
+        // Calculate path bounding box
+        const pathPoints = currentPath.points;
+        const minX = Math.min(...pathPoints.map(p => p.x));
+        const maxX = Math.max(...pathPoints.map(p => p.x));
+        const minY = Math.min(...pathPoints.map(p => p.y));
+        const maxY = Math.max(...pathPoints.map(p => p.y));
+        
+        const pathWidth = maxX - minX;
+        const pathHeight = maxY - minY;
+        const pathCenterX = minX + pathWidth / 2;
+        const pathCenterY = minY + pathHeight / 2;
+
+        // Try to get current transform state for smart scaling
+        const transformState = transformRef.current.state;
+        let targetScale;
+        let useSmartScaling = false;
+        
+        if (transformState && transformState.scale) {
+          console.log('🎥 AUTO-FOLLOW: Using smart scaling with current state');
+          useSmartScaling = true;
+          
+          // Add padding for smart scaling
+          const padding = Math.max(Math.max(pathWidth, pathHeight) * 0.2, 100);
+          const requiredWidth = pathWidth + padding * 2;
+          const requiredHeight = pathHeight + padding * 2;
+          
+          // Calculate scale needed to fit the path with padding
+          const scaleToFitX = rect.width / requiredWidth;
+          const scaleToFitY = rect.height / requiredHeight;
+          const scaleToFit = Math.min(scaleToFitX, scaleToFitY);
+          
+          const currentScale = transformState.scale;
+          
+          if (scaleToFit >= currentScale) {
+            // Path fits at current zoom - just pan
+            targetScale = currentScale;
+          } else {
+            // Path needs zoom out to fit
+            targetScale = Math.max(scaleToFit, 0.1);
+          }
+        } else {
+          console.log('🎥 AUTO-FOLLOW: Using simple scaling (transform state not ready)');
+          // Fallback to simple fit-to-viewport scaling
+          const imageWidth = tourData.backgroundImage.width;
+          const imageHeight = tourData.backgroundImage.height;
+          const scaleX = rect.width / imageWidth;
+          const scaleY = rect.height / imageHeight;
+          
+          if (isActuallyMobile) {
+            // On mobile, use more aggressive scaling to better utilize screen space
+            // Use the larger scale factor but cap it to avoid making it too large
+            targetScale = Math.min(Math.max(scaleX, scaleY), 2.5);
+            console.log('🎥 AUTO-FOLLOW: Mobile scaling - using max scale for better space utilization');
+          } else {
+            // On desktop, use conservative scaling to fit entire image
+            targetScale = Math.min(scaleX, scaleY);
+          }
+        }
+        
+        // Calculate translation to center the path
+        const scaledPathCenterX = pathCenterX * targetScale;
+        const scaledPathCenterY = pathCenterY * targetScale;
+        const translateX = (rect.width / 2) - scaledPathCenterX;
+        const translateY = (rect.height / 2) - scaledPathCenterY;
+        
+        console.log('🎥 AUTO-FOLLOW: Transform calculation:', {
+          path: { centerX: pathCenterX, centerY: pathCenterY, width: pathWidth, height: pathHeight },
+          viewport: { width: rect.width, height: rect.height },
+          image: { width: tourData.backgroundImage.width, height: tourData.backgroundImage.height },
+          isMobile,
+          scaling: useSmartScaling ? 'smart' : 'simple',
+          scaleFactors: { scaleX: rect.width / tourData.backgroundImage.width, scaleY: rect.height / tourData.backgroundImage.height },
+          targetScale,
+          scaledPathCenter: { x: scaledPathCenterX, y: scaledPathCenterY },
+          viewportCenter: { x: rect.width / 2, y: rect.height / 2 },
+          translation: { x: translateX, y: translateY }
+        });
+        
+        // Apply the transform
+        console.log('🎥 AUTO-FOLLOW: Applying setTransform with', { translateX, translateY, targetScale });
+        
+        try {
+          // Use working reset timing but with smoother visual transition
+          console.log('🎥 AUTO-FOLLOW: Reliable reset with smooth visual transition...');
+          
+          // Get current transform before reset for smooth transition calculation
+          const beforeState = transformRef.current.state;
+          console.log('🎥 AUTO-FOLLOW: Current state before reset:', beforeState);
+          
+          // Reset with working timing
+          //transformRef.current.resetTransform(0); // Instant reset for reliability
+          
+          setTimeout(() => {
+            console.log('🎥 AUTO-FOLLOW: Applying setTransform after reset...');
+            if (transformRef.current) {
+              // Use a longer animation duration to make the transition more gradual
+              transformRef.current.setTransform(translateX, translateY, targetScale, 1200);
+            }
+          }, 100); // Proven working delay
+          
+          // Verify the transform was applied by checking DOM after animation
+          setTimeout(() => {
+            const transformWrapper = wrapper.querySelector('[data-testid="transform-wrapper"]') || 
+                                   wrapper.querySelector('[class*="transform"]') ||
+                                   wrapper.querySelector('div[style*="transform"]');
+            
+            if (transformWrapper) {
+              const style = (transformWrapper as HTMLElement).style.transform;
+              console.log('🎥 AUTO-FOLLOW: DOM transform after setTransform:', style);
+            } else {
+              console.log('🎥 AUTO-FOLLOW: Could not find transform element in DOM');
+              // Log all divs to see what's there
+              const allDivs = wrapper.querySelectorAll('div');
+              console.log('🎥 AUTO-FOLLOW: Found divs:', Array.from(allDivs).map(div => ({
+                classes: (div as HTMLElement).className,
+                style: (div as HTMLElement).style.transform || 'no transform'
+              })));
+            }
+            
+            // Also check the transform ref state
+            const currentState = transformRef.current?.state;
+            console.log('🎥 AUTO-FOLLOW: Transform ref state after setTransform:', currentState);
+          }, 900);
+          
+        } catch (error) {
+          console.error('🎥 AUTO-FOLLOW: Error calling setTransform:', error);
+        }
+      };
+      
+      // Apply auto-follow with minimal delay
+      setTimeout(applyAutoFollow, 50); // Small delay to ensure DOM is ready
+    }
+  }, [tourData, enableZoomPan, autoFollow, currentSegmentIndex, isMobile]);
 
   // Force override fit-content styles after component mounts
   useEffect(() => {
@@ -99,25 +312,14 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
 
   const canvasContent = (
     <div
-      className="relative block"
-      style={isMobile ? {
-        width: '100%',
-        height: '100%',
-      } : {
-        width: backgroundImage.width,
-        height: backgroundImage.height,
-      }}
+      className="relative block w-full h-full"
     >
       {/* Background Image */}
       <img
         src={backgroundImage.url}
         alt="Tour background"
-        className={isMobile ? "block pointer-events-none w-full h-full object-contain" : "block pointer-events-none"}
+        className="block pointer-events-none w-full h-full object-contain"
         draggable={false}
-        style={isMobile ? {} : {
-          width: backgroundImage.width,
-          height: backgroundImage.height,
-        }}
       />
 
       {/* SVG Overlay */}
@@ -289,24 +491,8 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
   if (!enableZoomPan) {
     return (
       <div className={`relative overflow-hidden ${className}`}>
-        <div className="w-full h-full flex items-center justify-center bg-gray-50">
-          <div
-            className="relative max-w-full max-h-full"
-            style={{
-              aspectRatio: `${backgroundImage.width} / ${backgroundImage.height}`,
-            }}
-          >
-            <div
-              style={{
-                width: backgroundImage.width,
-                height: backgroundImage.height,
-                transform: 'scale(1)',
-                transformOrigin: 'center',
-              }}
-            >
-              {canvasContent}
-            </div>
-          </div>
+        <div className="w-full h-full bg-gray-50">
+          {canvasContent}
         </div>
       </div>
     );
@@ -320,8 +506,8 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
         initialScale={1}
         minScale={0.1}
         maxScale={5}
-        centerOnInit={!isMobile}
-        centerZoomedOut={!isMobile}
+        centerOnInit={false}
+        centerZoomedOut={false}
         wheel={{ disabled: false }}
         pinch={{ disabled: false }}
         doubleClick={{ disabled: false, mode: 'zoomIn', step: 0.7 }}

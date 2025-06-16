@@ -6,6 +6,7 @@ A React TypeScript component for creating interactive guided tours with zoom, pa
 
 - **Interactive Tour Canvas**: High-performance tour visualization with background images
 - **Zoom & Pan**: Full zoom and pan capabilities using react-zoom-pan-pinch
+- **Auto-Follow**: Smart camera positioning that frames each path segment optimally at segment start
 - **Point of Interest (POI) Support**: Interactive markers with detailed information
 - **Responsive Design**: Optimized layouts for both mobile and desktop
 - **Unified Control Panel**: Combined tour controls and POI information
@@ -59,6 +60,7 @@ const App = () => {
 | `showPOILabels` | `boolean` | `true` | Display POI labels on canvas |
 | `showInfoPanel` | `boolean` | `true` | Show combined info panel |
 | `enableZoomPan` | `boolean` | `true` | Enable zoom and pan functionality |
+| `autoFollow` | `boolean` | `true` | Automatically pan/zoom to follow tour progress |
 | `onTourComplete` | `() => void` | - | Callback when tour completes |
 | `onPOIVisit` | `(poi: POI) => void` | - | Callback when POI is visited |
 
@@ -165,6 +167,25 @@ The component uses Tailwind CSS classes and includes responsive design. You can 
 />
 ```
 
+### Auto-Follow Control
+
+```tsx
+// Enable auto-follow for guided experience (default)
+// Camera will automatically frame each path segment optimally
+<TourComponent
+  tourData={tourData}
+  autoFollow={true}
+/>
+
+// Disable auto-follow for manual exploration
+// Users maintain full control over zoom and pan
+<TourComponent
+  tourData={tourData}
+  autoFollow={false}
+  enableZoomPan={true}
+/>
+```
+
 ### Conditional Features
 
 ```tsx
@@ -175,6 +196,7 @@ const isMobile = window.innerWidth <= 768;
   enableZoomPan={!isMobile} // Disable zoom on mobile
   showPOILabels={!isMobile} // Hide labels on small screens
   autoStart={isMobile} // Auto-start on mobile
+  autoFollow={!isMobile} // Disable auto-follow on mobile for better touch control
 />
 ```
 
@@ -193,7 +215,15 @@ const isMobile = window.innerWidth <= 768;
 
 ## Recent Improvements
 
-### v1.1.0 (Latest)
+### v1.2.0 (Latest)
+- ✅ **Segment-Based Auto-Follow**: Camera reframes to show entire path segment at segment start
+- ✅ **Fixed Image Alignment**: Proper coordination between image and path overlays
+- ✅ **Simplified UX**: No camera movement during segment progress - stable viewing experience
+- ✅ **Optimal Framing**: Each path segment is framed optimally with appropriate padding
+- ✅ **Edge Case Handling**: Prevents paths from moving out of viewport during playback
+- ✅ **User Control**: Optional autoFollow prop to disable automatic camera movement
+
+### v1.1.0
 - ✅ **Fixed image scaling**: Images now use entire viewport correctly
 - ✅ **Enhanced zoom/pan**: Improved touch and mouse interactions
 - ✅ **Unified control panel**: No more tab switching between controls and POI info

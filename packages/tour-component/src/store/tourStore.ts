@@ -74,7 +74,10 @@ export const useTourStore = create<TourStore>((set, get) => ({
     });
   },
 
-  play: () => set({ isPlaying: true }),
+  play: () => {
+    console.log('🎬 TOUR STORE: play() called');
+    set({ isPlaying: true });
+  },
   
   pause: () => set({ isPlaying: false }),
   
@@ -96,10 +99,15 @@ export const useTourStore = create<TourStore>((set, get) => ({
   
   nextSegment: () => {
     const state = get();
-    if (!state.tourData || state.currentSegmentIndex >= state.tourData.paths.length - 1) return;
+    if (!state.tourData || state.currentSegmentIndex >= state.tourData.paths.length - 1) {
+      console.log('⏭️ TOUR STORE: nextSegment() - no more segments');
+      return;
+    }
     
     const nextIndex = state.currentSegmentIndex + 1;
     const nextPath = state.tourData.paths[nextIndex];
+    
+    console.log('⏭️ TOUR STORE: nextSegment() - advancing from segment', state.currentSegmentIndex, 'to', nextIndex);
     
     set({
       currentSegmentIndex: nextIndex,
@@ -199,6 +207,11 @@ export const useTourStore = create<TourStore>((set, get) => ({
     const currentPath = state.tourData.paths[state.currentSegmentIndex];
     if (!currentPath) return;
     
+    // Log progress updates (throttled to avoid spam)
+    if (Math.floor(segmentProgress * 10) !== Math.floor(state.segmentProgress * 10)) {
+      console.log('📍 TOUR STORE: updateSegmentPosition() - segment', state.currentSegmentIndex, 'progress:', Math.round(segmentProgress * 100) + '%');
+    }
+    
     const pathLength = calculatePathLength(currentPath.points);
     const distanceInSegment = pathLength * segmentProgress;
     const currentPoint = getPointAtDistance(currentPath.points, distanceInSegment);
@@ -295,9 +308,11 @@ export const useTourStore = create<TourStore>((set, get) => ({
     const currentPath = state.tourData.paths[state.currentSegmentIndex];
     if (!currentPath) return;
     
+    console.log('✅ TOUR STORE: completeCurrentSegment() - segment', state.currentSegmentIndex, 'completed');
+    
     // Check if this segment has an associated end POI
     if (currentPath.endPOI && !state.visitedPOIs.includes(currentPath.endPOI)) {
-      console.log('Segment completed - visiting POI:', currentPath.endPOI);
+      console.log('✅ TOUR STORE: Segment completed - visiting POI:', currentPath.endPOI);
       get().visitPOI(currentPath.endPOI);
     }
   },
