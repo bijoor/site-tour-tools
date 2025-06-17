@@ -28,7 +28,7 @@ const POIEditPopup: React.FC = () => {
       const defaultLabel = `POI ${(tourData?.pois.length || 0) + 1}`;
       setLabel(defaultLabel);
       setDescription('');
-      setShowLabel(true);
+      setShowLabel(false);
     } else if (poi) {
       // Set values for existing POI
       setLabel(poi.label);

@@ -104,7 +104,7 @@ export const useDrawingStore = create<DrawingStore>((set, get) => ({
     });
   },
 
-  createPOI: (label, description, showLabel = true) => {
+  createPOI: (label, description, showLabel = false) => {
     const state = get();
     if (!state.tourData || !state.pendingPOI) return;
     

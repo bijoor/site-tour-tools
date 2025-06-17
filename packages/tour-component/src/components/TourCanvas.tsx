@@ -431,7 +431,7 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
                 )}
 
                 {/* POI Label */}
-                {showPOILabels && (
+                {showPOILabels && (poi.showLabel !== false) && (
                   <text
                     x={poi.position.x}
                     y={poi.position.y - tourData.settings.theme.poi.size - 5}

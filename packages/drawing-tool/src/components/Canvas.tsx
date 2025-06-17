@@ -1,7 +1,7 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { useDrawingStore } from '../store/drawingStore';
-import { findNearestPOI } from '@site-tour-tools/shared';
+import { findNearestPOI, generatePOIId } from '@site-tour-tools/shared';
 import { useMobileDetection } from '../hooks/useMobileDetection';
 import POILayer from './POILayer';
 import PathLayer from './PathLayer';
@@ -108,7 +108,30 @@ const Canvas: React.FC = () => {
     });
 
     if (mode === 'poi') {
-      startPOICreation({ x, y });
+      // Directly create POI with default values instead of showing dialog first
+      const state = useDrawingStore.getState();
+      if (!state.tourData) return;
+      
+      const defaultLabel = `POI ${(state.tourData.pois.length || 0) + 1}`;
+      const newPOI = {
+        id: generatePOIId(),
+        position: { x, y },
+        label: defaultLabel,
+        description: undefined,
+        showLabel: false, // Default to false as requested
+        isConnected: false,
+      };
+      
+      const updatedTourData = {
+        ...state.tourData,
+        pois: [...state.tourData.pois, newPOI],
+        updatedAt: new Date().toISOString(),
+      };
+      
+      useDrawingStore.setState({ 
+        tourData: updatedTourData,
+        selectedPOI: newPOI.id // Select the newly created POI for editing
+      });
     } else if (mode === 'path') {
       if (!isDrawing) {
         startPath({ x, y });
