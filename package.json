@@ -26,7 +26,7 @@
     
     "build:all": "npm run build:shared && npm run build:component && npm run build:drawing && npm run build:demo",
     "deploy": "npm run build:all && npm run copy:docs",
-    "copy:docs": "cp -r packages/drawing-tool/dist/* docs/ && cp -r packages/tour-component/demo/dist/* docs/tour-player/"
+    "copy:docs": "cp -r packages/drawing-tool/dist/* docs/ && cp -r packages/tour-component/demo/dist/* docs/tour-player/ && cp packages/tour-component/demo/public/examples/* docs/examples/"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
