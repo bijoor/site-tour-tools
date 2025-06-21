@@ -64,7 +64,7 @@
         "y": 179.3330122029544
       },
       "label": "Rhino",
-      "showLabel": true,
+      "showLabel": false,
       "isConnected": false
     },
     {
@@ -76,16 +76,6 @@
       "label": "Polar Bear",
       "showLabel": false,
       "isConnected": true
-    },
-    {
-      "id": "poi_1750053068674_z7dmjj32i",
-      "position": {
-        "x": 222.63277775715724,
-        "y": 180.12042389210018
-      },
-      "label": "POI 8",
-      "showLabel": false,
-      "isConnected": false
     },
     {
       "id": "poi_1750053131861_7g888t0n5",
@@ -277,7 +267,8 @@
       "endPOI": "poi_1749968950241_6z7zsbjmk",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1749968934703_z79fm3cbn"
     },
     {
       "id": "path_1749969049870_pxtof0y9o",
@@ -306,7 +297,8 @@
       "endPOI": "poi_1749968963666_3ovpssrw1",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1749968950241_6z7zsbjmk"
     },
     {
       "id": "path_1749969058721_8r1y6r15e",
@@ -354,7 +346,8 @@
       "endPOI": "poi_1749968974421_45rgye2j2",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1749968963666_3ovpssrw1"
     },
     {
       "id": "path_1749969071560_wig05sd8k",
@@ -413,7 +406,8 @@
       "endPOI": "poi_1749969016256_skg89x5mz",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1749968974421_45rgye2j2"
     },
     {
       "id": "path_1750053028843_kwyazx2l4",
@@ -446,7 +440,8 @@
       "endPOI": "poi_1750053039075_4ai0rjy3v",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1749969016256_skg89x5mz"
     },
     {
       "id": "path_1750053088347_ocerasn3p",
@@ -499,7 +494,8 @@
       "endPOI": "poi_1750053062097_06mnzzjvt",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053039075_4ai0rjy3v"
     },
     {
       "id": "path_1750053401034_i9knm3rng",
@@ -588,7 +584,8 @@
       "endPOI": "poi_1750053131861_7g888t0n5",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053062097_06mnzzjvt"
     },
     {
       "id": "path_1750053414220_dh0ofyoo3",
@@ -635,7 +632,8 @@
       "endPOI": "poi_1750053158398_pn43kuevl",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053131861_7g888t0n5"
     },
     {
       "id": "path_1750053429102_yskhfpcsr",
@@ -712,7 +710,8 @@
       "endPOI": "poi_1750053179489_iz3e3nld3",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053158398_pn43kuevl"
     },
     {
       "id": "path_1750053443274_it1ry663l",
@@ -790,7 +789,8 @@
       "endPOI": "poi_1750053194756_veq8elr3q",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053179489_iz3e3nld3"
     },
     {
       "id": "path_1750053460252_m7o8ayq3m",
@@ -859,7 +859,8 @@
       "endPOI": "poi_1750053210090_2bnfj5iwv",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053194756_veq8elr3q"
     },
     {
       "id": "path_1750053469988_r5ufv9uyo",
@@ -907,7 +908,8 @@
       "endPOI": "poi_1750053226871_il64ejv8i",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053210090_2bnfj5iwv"
     },
     {
       "id": "path_1750053479534_4f0v27plf",
@@ -954,7 +956,8 @@
       "endPOI": "poi_1750053242996_2wx5v6rz5",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053226871_il64ejv8i"
     },
     {
       "id": "path_1750053495578_yyghe4jhk",
@@ -1031,7 +1034,8 @@
       "endPOI": "poi_1750053327430_vbajppz4f",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053242996_2wx5v6rz5"
     },
     {
       "id": "path_1750053505315_eh9hbc7ak",
@@ -1090,7 +1094,8 @@
       "endPOI": "poi_1750053304375_ydmg97gdd",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053327430_vbajppz4f"
     },
     {
       "id": "path_1750053518017_4l14nbsoj",
@@ -1143,7 +1148,8 @@
       "endPOI": "poi_1750053289675_qo3372htd",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053304375_ydmg97gdd"
     },
     {
       "id": "path_1750053528983_tq2s4iyjj",
@@ -1202,7 +1208,8 @@
       "endPOI": "poi_1750053274420_nlyduhje2",
       "color": "#3b82f6",
       "width": 3,
-      "style": "solid"
+      "style": "solid",
+      "startPOI": "poi_1750053289675_qo3372htd"
     },
     {
       "id": "path_1750053539587_wip6u9i06",
@@ -1267,6 +1274,97 @@
       "endPOI": "poi_1750053364387_5zxjmtowf",
       "color": "#3b82f6",
       "width": 3,
+      "style": "solid",
+      "startPOI": "poi_1750053274420_nlyduhje2"
+    },
+    {
+      "id": "path_1750185954111_pmn1nbv32",
+      "points": [
+        {
+          "id": "point_1750185936508_prs8k87ub",
+          "x": 243.5601614317284,
+          "y": 489.79223678114226,
+          "timestamp": 1750185936508
+        },
+        {
+          "id": "point_1750185939973_1gl66k39x",
+          "x": 239.97849963697738,
+          "y": 462.571607899704,
+          "timestamp": 1750185939973
+        },
+        {
+          "id": "point_1750185941273_di0d6r71f",
+          "x": 253.58881445703128,
+          "y": 456.12461684883704,
+          "timestamp": 1750185941273
+        },
+        {
+          "id": "point_1750185942907_3oabusexa",
+          "x": 275.7951175844877,
+          "y": 450.3939581369553,
+          "timestamp": 1750185942907
+        },
+        {
+          "id": "point_1750185945916_44j5e6v6d",
+          "x": 295.85826002706693,
+          "y": 432.8740103180624,
+          "connectedPOI": "poi_1750053242996_2wx5v6rz5",
+          "timestamp": 1750185945916
+        },
+        {
+          "id": "point_1750185946081_bzcayvlbf",
+          "x": 295.85826002706693,
+          "y": 432.8740103180624,
+          "connectedPOI": "poi_1750053242996_2wx5v6rz5",
+          "timestamp": 1750185946081
+        }
+      ],
+      "startPOI": "poi_1749968934703_z79fm3cbn",
+      "endPOI": "poi_1750053242996_2wx5v6rz5",
+      "color": "#3b82f6",
+      "width": 3,
+      "style": "solid"
+    },
+    {
+      "id": "path_1750185988028_07zslurog",
+      "points": [
+        {
+          "id": "point_1750185978573_a7s9qia0r",
+          "x": 240.6948319959276,
+          "y": 334.34811922135015,
+          "timestamp": 1750185978573
+        },
+        {
+          "id": "point_1750185980218_pzyyl9hct",
+          "x": 261.4684704054836,
+          "y": 319.3051401026606,
+          "timestamp": 1750185980218
+        },
+        {
+          "id": "point_1750185982577_1iav65432",
+          "x": 292.98709419929264,
+          "y": 302.11316396701534,
+          "timestamp": 1750185982577
+        },
+        {
+          "id": "point_1750185985147_598jqcjhf",
+          "x": 333.6535356176181,
+          "y": 269.0944848134567,
+          "connectedPOI": "poi_1750053210090_2bnfj5iwv",
+          "timestamp": 1750185985147
+        },
+        {
+          "id": "point_1750185985326_qwlmy05tr",
+          "x": 333.6535356176181,
+          "y": 269.0944848134567,
+          "connectedPOI": "poi_1750053210090_2bnfj5iwv",
+          "timestamp": 1750185985326
+        }
+      ],
+      "startPOI": "poi_1749968974421_45rgye2j2",
+      "endPOI": "poi_1750053210090_2bnfj5iwv",
+      "color": "#3b82f6",
+      "width": 3,
       "style": "solid"
     }
   ],
@@ -1295,5 +1393,5 @@
     }
   },
   "createdAt": "2025-06-15T06:26:29.679Z",
-  "updatedAt": "2025-06-16T05:58:59.587Z"
+  "updatedAt": "2025-06-17T18:48:02.348Z"
 }

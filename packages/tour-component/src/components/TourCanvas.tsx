@@ -31,6 +31,11 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
     visitedPOIs,
     currentSegmentIndex,
     segmentProgress,
+    availablePaths,
+    selectedPath,
+    isPathSelectionMode,
+    selectPath,
+    navigateToPath,
   } = useTourStore();
 
   // Auto-fit image to viewport when tour data loads
@@ -336,28 +341,114 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
             const pathData = `M ${path.points[0].x} ${path.points[0].y} ` +
               path.points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
 
-            // Only show paths that have been reached (current or previously completed)
+            // Determine path visibility and interaction
             const isCurrentPath = pathIndex === currentSegmentIndex;
-            const isCompletedPath = pathIndex < currentSegmentIndex;
-            const shouldShowPath = isCurrentPath || isCompletedPath;
             
-            if (!shouldShowPath) return null; // Hide future paths
+            // A path is completed if both its start and end POIs have been visited
+            const isCompletedPath = path.startPOI && path.endPOI && 
+              visitedPOIs.includes(path.startPOI) && visitedPOIs.includes(path.endPOI);
+            const isAvailablePath = isPathSelectionMode && availablePaths.includes(path.id);
+            const isSelectedPath = isPathSelectionMode && selectedPath === path.id;
+            const isDefaultPath = isPathSelectionMode && availablePaths.length > 0 && path.id === availablePaths[0];
+            
+            // Determine if this is a reverse path by checking if we're in selection mode
+            // and if the current path's endPOI matches this path's endPOI
+            const currentPath = tourData?.paths[currentSegmentIndex];
+            const isReversePath = isPathSelectionMode && isAvailablePath && 
+              currentPath?.endPOI && path.endPOI === currentPath.endPOI;
+            
+            // Show completed paths, current path, and available paths in selection mode
+            const shouldShowPath = isCurrentPath || isCompletedPath || isAvailablePath;
+            
+            if (!shouldShowPath) return null;
+
+            // Handle path click in selection mode
+            const handlePathClick = () => {
+              if (isPathSelectionMode && isAvailablePath) {
+                console.log('🖱️ PATH CLICK: Selecting path', path.id);
+                selectPath(path.id);
+                // Auto-navigate after a short delay to allow user to see selection
+                setTimeout(() => {
+                  navigateToPath();
+                }, 500);
+              }
+            };
+
+            // Determine path styling
+            let pathStroke = path.color || tourData.settings.theme.path.color;
+            let pathStrokeWidth = path.width || tourData.settings.theme.path.width;
+            let pathOpacity = 1;
+            let strokeDasharray = 'none';
+            let pathClass = 'pointer-events-none';
+            
+            if (isPathSelectionMode && isAvailablePath) {
+              // Available paths in selection mode
+              pathClass = 'pointer-events-auto cursor-pointer';
+              
+              if (isSelectedPath && !isDefaultPath) {
+                // Selected path (non-default) - highlight with thicker stroke and orange
+                pathStrokeWidth = pathStrokeWidth + 4;
+                pathStroke = '#f97316'; // Orange highlight
+                pathOpacity = 1;
+              } else if (isDefaultPath) {
+                // Default path - solid line, same color and thickness as alternatives
+                pathOpacity = 0.8;
+                pathStroke = path.color || tourData.settings.theme.path.color; // Same color as alternatives
+                // Same thickness as alternatives - no extra thickness even when selected
+                // No strokeDasharray = solid line
+              } else if (isReversePath) {
+                // Reverse paths - dotted line to distinguish from regular alternatives
+                strokeDasharray = '2,3';
+                pathOpacity = 0.8;
+                pathStroke = '#8b5cf6'; // Purple color for reverse paths
+              } else {
+                // Alternative paths - dashed line
+                strokeDasharray = '8,4';
+                pathOpacity = 0.8;
+                pathStroke = path.color || tourData.settings.theme.path.color; // Same color as default
+              }
+            } else if (isCompletedPath) {
+              pathOpacity = 0.6;
+            }
             
             return (
               <g key={path.id}>
                 {/* Base path */}
                 <path
                   d={pathData}
-                  stroke={path.color || tourData.settings.theme.path.color}
-                  strokeWidth={path.width || tourData.settings.theme.path.width}
+                  stroke={pathStroke}
+                  strokeWidth={pathStrokeWidth}
+                  strokeDasharray={strokeDasharray}
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  opacity={isCompletedPath ? 0.6 : 1}
+                  opacity={pathOpacity}
+                  className={pathClass}
+                  onClick={handlePathClick}
+                  style={{
+                    transition: 'all 0.2s ease',
+                  }}
                 />
                 
+                {/* Hover effect for available paths */}
+                {isPathSelectionMode && isAvailablePath && (
+                  <path
+                    d={pathData}
+                    stroke="transparent"
+                    strokeWidth={pathStrokeWidth + 8}
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="pointer-events-auto cursor-pointer hover:stroke-orange-200 hover:opacity-30"
+                    onClick={handlePathClick}
+                    style={{
+                      transition: 'all 0.2s ease',
+                    }}
+                  />
+                )}
+                
                 {/* Progress indicator on current path */}
-                {isCurrentPath && (
+                {isCurrentPath && !isPathSelectionMode && (
                   <motion.path
                     d={pathData}
                     stroke={tourData.settings.theme.path.activeColor}
@@ -376,6 +467,7 @@ const TourCanvas: React.FC<TourCanvasProps> = ({
                     }}
                   />
                 )}
+
               </g>
             );
           })}

@@ -27,6 +27,9 @@ const TourInfoPanel: React.FC<TourInfoPanelProps> = ({
     tourData,
     progress,
     visitedPOIs,
+    availablePaths,
+    selectedPath,
+    isPathSelectionMode,
     play,
     pause,
     stop,
@@ -36,6 +39,7 @@ const TourInfoPanel: React.FC<TourInfoPanelProps> = ({
   } = useTourStore();
 
   const handlePlayPause = () => {
+    console.log('🎮 TOUR INFO PANEL: handlePlayPause called, isPlaying:', isPlaying);
     if (isPlaying) {
       pause();
     } else {
@@ -76,7 +80,10 @@ const TourInfoPanel: React.FC<TourInfoPanelProps> = ({
             exit={{ y: '100%', opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className={`bg-white shadow-2xl border-t border-gray-200 overflow-hidden absolute bottom-0 left-0 right-0 ${className}`}
-            style={{ height: '200px' }}
+            style={{ 
+              height: isMinimized ? '60px' : 'min(200px, 40vh)',
+              maxHeight: '40vh'
+            }}
           >
             <div className={`p-3 transition-all duration-300 ${isMinimized ? 'max-h-16' : 'max-h-96'} overflow-y-auto`}>
               {/* Tour Controls - Always Visible */}
@@ -141,13 +148,14 @@ const TourInfoPanel: React.FC<TourInfoPanelProps> = ({
 
                         <button
                           onClick={handlePlayPause}
-                          className={`p-2 rounded-full ${
+                          className={`p-1.5 rounded ${ 
                             isPlaying 
-                              ? 'bg-red-500 hover:bg-red-600' 
-                              : 'bg-blue-500 hover:bg-blue-600'
-                          } text-white`}
+                              ? 'bg-red-500 hover:bg-red-600 text-white' 
+                              : 'bg-blue-500 hover:bg-blue-600 text-white'
+                          }`}
+                          title={isPlaying ? 'Pause Tour' : 'Start Tour'}
                         >
-                          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                          {isPlaying ? <Pause size={14} /> : <Play size={14} />}
                         </button>
 
                         <button
@@ -308,6 +316,7 @@ const TourInfoPanel: React.FC<TourInfoPanelProps> = ({
                             ? 'bg-red-500 hover:bg-red-600' 
                             : 'bg-blue-500 hover:bg-blue-600'
                         } text-white`}
+                        title={isPlaying ? 'Pause Tour' : 'Start Tour'}
                       >
                         {isPlaying ? <Pause size={20} /> : <Play size={20} />}
                       </button>
@@ -346,6 +355,52 @@ const TourInfoPanel: React.FC<TourInfoPanelProps> = ({
                       </div>
                     </div>
                   </div>
+
+                  {/* Path Selection Section */}
+                  {isPathSelectionMode && availablePaths.length > 0 && (
+                    <div className="border-t border-gray-200 pt-3 space-y-3">
+                      <h3 className="text-sm font-medium text-gray-900">
+                        {availablePaths.length === 1 ? 'Continue to Next Path' : 'Choose Your Next Path'}
+                      </h3>
+                      
+                      <div className="space-y-3">
+                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                            <span className="text-sm font-medium text-orange-800">
+                              Click on a path in the map to continue
+                            </span>
+                          </div>
+                          <div className="text-xs text-orange-700 space-y-1">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-4 h-0.5 bg-blue-500"></div>
+                              <span>Solid line = Default path</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-4 h-0.5 bg-gray-500" style={{ backgroundImage: 'repeating-linear-gradient(to right, #6b7280 0, #6b7280 4px, transparent 4px, transparent 8px)' }}></div>
+                              <span>Dashed line = Alternative paths</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-4 h-0.5 bg-purple-500" style={{ backgroundImage: 'repeating-linear-gradient(to right, #8b5cf6 0, #8b5cf6 2px, transparent 2px, transparent 5px)' }}></div>
+                              <span>Dotted purple = Reverse paths</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {selectedPath && (
+                          <div className="text-xs text-green-600 bg-green-50 border border-green-200 rounded p-2">
+                            ✓ Selected: {selectedPath === tourData?.paths[currentSegmentIndex + 1]?.id ? 'Default path' : `Path ${tourData?.paths.findIndex(p => p.id === selectedPath) + 1}`}
+                          </div>
+                        )}
+                        
+                        {availablePaths.length > 1 && (
+                          <div className="text-xs text-gray-500">
+                            {availablePaths.length} paths available from this location
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* POI Information Section - Shows when POI is selected */}
                   {selectedPOI && (
@@ -422,14 +477,11 @@ const TourInfoPanel: React.FC<TourInfoPanelProps> = ({
               )}
             </div>
 
-            {/* Tour Info Footer */}
-            {!isMinimized && (
+            {/* Tour Info Footer - Only show description if available */}
+            {!isMinimized && tourData.description && (
               <div className="mt-auto pt-4 border-t border-gray-200">
                 <div className="text-center">
-                  <h4 className="text-sm font-medium text-gray-900">{tourData.name}</h4>
-                  {tourData.description && (
-                    <p className="text-xs text-gray-600 mt-1">{tourData.description}</p>
-                  )}
+                  <p className="text-xs text-gray-600">{tourData.description}</p>
                 </div>
               </div>
             )}

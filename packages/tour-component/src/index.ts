@@ -10,3 +10,5 @@ export { useTourStore } from './store/tourStore';
 export { useTourAnimation } from './hooks/useTourAnimation';
 
 export type { TourComponentProps } from './components/TourComponent';
+
+// Force rebuild: path selection implementation complete

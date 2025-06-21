@@ -40,11 +40,13 @@ interface DrawingStore extends DrawingToolState {
   startPath: (point: Point) => void;
   addPathPoint: (point: Point, connectedPOI?: string) => void;
   completePath: () => void;
-  completePathWithPOI: (endPOI?: string) => void;
+  completePathWithPOI: (endPOI?: string, startPOI?: string) => void;
   cancelPath: () => void;
   updatePath: (id: string, updates: Partial<PathSegment>) => void;
   deletePath: (id: string) => void;
   selectPath: (id: string | undefined) => void;
+  movePathUp: (id: string) => void;
+  movePathDown: (id: string) => void;
   
   // POI Association Dialog
   showPOIDialog: () => void;
@@ -242,13 +244,35 @@ export const useDrawingStore = create<DrawingStore>((set, get) => ({
     set({ showPOIAssociationDialog: true });
   },
 
-  completePathWithPOI: (endPOI) => {
+  completePathWithPOI: (endPOI, startPOI) => {
+    console.log('🔍 Store: completePathWithPOI called with:', { endPOI, startPOI });
+    
     const state = get();
-    if (!state.currentPath || !state.tourData || state.currentPath.length < 2) return;
+    console.log('🔍 Store: Current state:', {
+      hasCurrentPath: !!state.currentPath,
+      currentPathLength: state.currentPath?.length,
+      hasTourData: !!state.tourData
+    });
+    
+    if (!state.currentPath || !state.tourData || state.currentPath.length < 2) {
+      console.log('🚨 Store: Early return - invalid state');
+      return;
+    }
+    
+    // Use provided startPOI or auto-detect from the first point if it's connected to a POI
+    const firstPoint = state.currentPath[0];
+    const finalStartPOI = startPOI || firstPoint.connectedPOI;
+    
+    console.log('🔍 Store: Creating path with:', {
+      finalStartPOI,
+      endPOI,
+      pathLength: state.currentPath.length
+    });
     
     const newPath: PathSegment = {
       id: generatePathId(),
       points: state.currentPath,
+      startPOI: finalStartPOI, // Use provided or auto-detected start POI
       endPOI, // Add POI association
       color: state.tourData.settings.theme.path.color,
       width: state.tourData.settings.theme.path.width,
@@ -271,12 +295,16 @@ export const useDrawingStore = create<DrawingStore>((set, get) => ({
       updatedAt: new Date().toISOString(),
     };
     
+    console.log('🔍 Store: Updating state with new path');
+    
     set({ 
       tourData: updatedTourData,
       currentPath: null,
       isDrawing: false,
       showPOIAssociationDialog: false,
     });
+    
+    console.log('🔍 Store: completePathWithPOI completed successfully');
   },
   
   cancelPath: () => set({ 
@@ -417,5 +445,45 @@ export const useDrawingStore = create<DrawingStore>((set, get) => ({
       console.error('Failed to import tour data:', error);
       throw error; // Re-throw so the UI can handle it
     }
+  },
+
+  movePathUp: (id) => {
+    const state = get();
+    if (!state.tourData) return;
+    
+    const currentIndex = state.tourData.paths.findIndex(path => path.id === id);
+    if (currentIndex <= 0) return; // Already at top or not found
+    
+    const newPaths = [...state.tourData.paths];
+    // Swap with previous path
+    [newPaths[currentIndex - 1], newPaths[currentIndex]] = [newPaths[currentIndex], newPaths[currentIndex - 1]];
+    
+    const updatedTourData = {
+      ...state.tourData,
+      paths: newPaths,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    set({ tourData: updatedTourData });
+  },
+
+  movePathDown: (id) => {
+    const state = get();
+    if (!state.tourData) return;
+    
+    const currentIndex = state.tourData.paths.findIndex(path => path.id === id);
+    if (currentIndex < 0 || currentIndex >= state.tourData.paths.length - 1) return; // Already at bottom or not found
+    
+    const newPaths = [...state.tourData.paths];
+    // Swap with next path
+    [newPaths[currentIndex], newPaths[currentIndex + 1]] = [newPaths[currentIndex + 1], newPaths[currentIndex]];
+    
+    const updatedTourData = {
+      ...state.tourData,
+      paths: newPaths,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    set({ tourData: updatedTourData });
   },
 }));

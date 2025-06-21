@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Route, Edit2, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { MapPin, Route, Edit2, Eye, EyeOff, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { useDrawingStore } from '../store/drawingStore';
 import { POI } from '@site-tour-tools/shared';
 
@@ -13,11 +13,16 @@ const Sidebar: React.FC = () => {
     updatePOI,
     deletePOI,
     deletePath,
+    movePathUp,
+    movePathDown,
+    setTourData,
   } = useDrawingStore();
 
   const [editingPOI, setEditingPOI] = useState<string | null>(null);
   const [editingLabel, setEditingLabel] = useState('');
   const [editingDescription, setEditingDescription] = useState('');
+  const [editingTourName, setEditingTourName] = useState(false);
+  const [tourNameValue, setTourNameValue] = useState('');
 
   if (!tourData) {
     return (
@@ -70,11 +75,94 @@ const Sidebar: React.FC = () => {
     }
   };
 
+  const handleMovePathUp = (e: React.MouseEvent, pathId: string) => {
+    e.stopPropagation();
+    movePathUp(pathId);
+  };
+
+  const handleMovePathDown = (e: React.MouseEvent, pathId: string) => {
+    e.stopPropagation();
+    movePathDown(pathId);
+  };
+
+  const handleTourNameEdit = () => {
+    if (!tourData) return;
+    setEditingTourName(true);
+    setTourNameValue(tourData.name);
+  };
+
+  const handleTourNameSave = () => {
+    if (!tourData || !tourNameValue.trim()) return;
+    const updatedTourData = {
+      ...tourData,
+      name: tourNameValue.trim(),
+      updatedAt: new Date().toISOString(),
+    };
+    setTourData(updatedTourData);
+    setEditingTourName(false);
+  };
+
+  const handleTourNameCancel = () => {
+    setEditingTourName(false);
+    setTourNameValue('');
+  };
+
+  const handleTourNameKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleTourNameSave();
+    } else if (e.key === 'Escape') {
+      handleTourNameCancel();
+    }
+  };
+
   return (
     <div className="w-80 bg-white border-l border-gray-200 flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">{tourData.name}</h2>
+        {editingTourName ? (
+          <div className="space-y-2">
+            <input
+              type="text"
+              value={tourNameValue}
+              onChange={(e) => setTourNameValue(e.target.value)}
+              onKeyDown={handleTourNameKeyPress}
+              className="w-full text-lg font-semibold bg-transparent border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Tour name"
+              autoFocus
+            />
+            <div className="flex space-x-2">
+              <button
+                onClick={handleTourNameSave}
+                className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600"
+              >
+                Save
+              </button>
+              <button
+                onClick={handleTourNameCancel}
+                className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <h2 
+              className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-600 flex-1"
+              onClick={handleTourNameEdit}
+              title="Click to edit tour name"
+            >
+              {tourData.name}
+            </h2>
+            <button
+              onClick={handleTourNameEdit}
+              className="p-1 text-gray-400 hover:text-blue-500"
+              title="Edit tour name"
+            >
+              <Edit2 size={16} />
+            </button>
+          </div>
+        )}
         <p className="text-sm text-gray-600 mt-1">
           {tourData.pois.length} POIs • {tourData.paths.length} Paths
         </p>
@@ -200,6 +288,9 @@ const Sidebar: React.FC = () => {
             <p className="text-sm text-gray-500 italic">No paths created yet</p>
           ) : (
             <div className="space-y-2">
+              <div className="text-xs text-gray-500 mb-2">
+                Tip: Use ↑↓ buttons to reorder paths. The first path is the default tour start.
+              </div>
               {tourData.paths.map((path, index) => {
                 const connectedPOIs = path.points
                   .filter(point => point.connectedPOI)
@@ -208,6 +299,9 @@ const Sidebar: React.FC = () => {
                     return poi?.label;
                   })
                   .filter(Boolean);
+
+                const startPOI = path.startPOI ? tourData.pois.find(p => p.id === path.startPOI) : null;
+                const endPOI = path.endPOI ? tourData.pois.find(p => p.id === path.endPOI) : null;
 
                 return (
                   <div
@@ -227,17 +321,61 @@ const Sidebar: React.FC = () => {
                             style={{ backgroundColor: path.color || '#3b82f6' }}
                           />
                           <span className="font-medium text-sm">Path {index + 1}</span>
+                          {index === 0 && (
+                            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
+                              Tour Start
+                            </span>
+                          )}
                         </div>
                         <p className="text-xs text-gray-600 mt-1">
                           {path.points.length} points
                         </p>
-                        {connectedPOIs.length > 0 && (
+                        {startPOI && (
+                          <p className="text-xs text-green-600 mt-1">
+                            From: {startPOI.label}
+                          </p>
+                        )}
+                        {endPOI && (
+                          <p className="text-xs text-blue-600 mt-1">
+                            To: {endPOI.label}
+                          </p>
+                        )}
+                        {connectedPOIs.length > 0 && !startPOI && !endPOI && (
                           <p className="text-xs text-gray-500 mt-1">
                             Connected: {connectedPOIs.join(', ')}
                           </p>
                         )}
                       </div>
-                      <div className="flex space-x-1">
+                      <div className="flex items-center space-x-1">
+                        {/* Reorder buttons */}
+                        <div className="flex flex-col">
+                          <button
+                            onClick={(e) => handleMovePathUp(e, path.id)}
+                            disabled={index === 0}
+                            className={`p-0.5 ${
+                              index === 0 
+                                ? 'text-gray-300 cursor-not-allowed' 
+                                : 'text-gray-400 hover:text-blue-500'
+                            }`}
+                            title="Move up"
+                          >
+                            <ChevronUp size={12} />
+                          </button>
+                          <button
+                            onClick={(e) => handleMovePathDown(e, path.id)}
+                            disabled={index === tourData.paths.length - 1}
+                            className={`p-0.5 ${
+                              index === tourData.paths.length - 1 
+                                ? 'text-gray-300 cursor-not-allowed' 
+                                : 'text-gray-400 hover:text-blue-500'
+                            }`}
+                            title="Move down"
+                          >
+                            <ChevronDown size={12} />
+                          </button>
+                        </div>
+                        {/* Action buttons */}
+                        <div className="flex space-x-1">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -258,6 +396,7 @@ const Sidebar: React.FC = () => {
                         >
                           <Trash2 size={14} />
                         </button>
+                        </div>
                       </div>
                     </div>
                   </div>

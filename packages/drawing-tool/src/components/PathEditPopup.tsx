@@ -11,12 +11,14 @@ const PathEditPopup: React.FC = () => {
     selectPath,
   } = useDrawingStore();
 
+  const [startPOI, setStartPOI] = useState<string | undefined>(undefined);
   const [endPOI, setEndPOI] = useState<string | undefined>(undefined);
 
   const path = tourData?.paths.find(p => p.id === selectedPath);
 
   useEffect(() => {
     if (path) {
+      setStartPOI(path.startPOI);
       setEndPOI(path.endPOI);
     }
   }, [path]);
@@ -26,8 +28,9 @@ const PathEditPopup: React.FC = () => {
   }
 
   const handleSave = () => {
-    // Update path with new endPOI
+    // Update path with new startPOI and endPOI
     updatePath(path.id, {
+      startPOI: startPOI || undefined,
       endPOI: endPOI || undefined,
     });
     selectPath(undefined); // Close popup
@@ -67,6 +70,27 @@ const PathEditPopup: React.FC = () => {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
+              Start Point Association
+            </label>
+            <select
+              value={startPOI || ''}
+              onChange={(e) => setStartPOI(e.target.value || undefined)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">None (path doesn't start from a POI)</option>
+              {availablePOIs.map(poi => (
+                <option key={poi.id} value={poi.id}>
+                  {poi.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Set which POI this path starts from for interactive navigation.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               End Point Association
             </label>
             <select
@@ -91,6 +115,12 @@ const PathEditPopup: React.FC = () => {
               <div>Points: {path.points.length}</div>
               <div>Start: ({Math.round(path.points[0]?.x || 0)}, {Math.round(path.points[0]?.y || 0)})</div>
               <div>End: ({Math.round(path.points[path.points.length - 1]?.x || 0)}, {Math.round(path.points[path.points.length - 1]?.y || 0)})</div>
+              {startPOI && (
+                <div className="flex items-center space-x-1 text-green-600">
+                  <MapPin size={12} />
+                  <span>Starts from: {availablePOIs.find(p => p.id === startPOI)?.label}</span>
+                </div>
+              )}
               {endPOI && (
                 <div className="flex items-center space-x-1 text-blue-600">
                   <MapPin size={12} />

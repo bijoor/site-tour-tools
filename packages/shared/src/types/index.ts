@@ -22,6 +22,7 @@ export interface PathPoint extends Point {
 export interface PathSegment {
   id: string;
   points: PathPoint[];
+  startPOI?: string; // Optional POI association for path starting point
   endPOI?: string; // Optional POI association for path endpoint
   color?: string;
   width?: number;

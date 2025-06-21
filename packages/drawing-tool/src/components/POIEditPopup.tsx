@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, MapPin, Trash2, Save, Plus } from 'lucide-react';
+import { X, MapPin, Trash2, Save, Plus, Route } from 'lucide-react';
 import { useDrawingStore } from '../store/drawingStore';
-import { POI } from '@site-tour-tools/shared';
+import { POI, PathSegment } from '@site-tour-tools/shared';
 
 const POIEditPopup: React.FC = () => {
   const {
@@ -13,6 +13,7 @@ const POIEditPopup: React.FC = () => {
     selectPOI,
     createPOI,
     cancelPOICreation,
+    updatePath,
   } = useDrawingStore();
 
   const [label, setLabel] = useState('');
@@ -21,6 +22,22 @@ const POIEditPopup: React.FC = () => {
 
   const isCreating = selectedPOI === 'pending' && pendingPOI;
   const poi = isCreating ? null : tourData?.pois.find(p => p.id === selectedPOI);
+
+  // Find paths connected to this POI
+  const connectedPaths = poi && tourData ? tourData.paths.filter(path => {
+    // Check if POI is connected through path points, startPOI, or endPOI
+    const isConnectedThroughPoints = path.points.some(point => point.connectedPOI === poi.id);
+    const isStartPOI = path.startPOI === poi.id;
+    const isEndPOI = path.endPOI === poi.id;
+    return isConnectedThroughPoints || isStartPOI || isEndPOI;
+  }) : [];
+
+  // Find paths that could potentially start from this POI (paths that are connected but don't have startPOI set)
+  const availableStartPaths = poi && tourData ? tourData.paths.filter(path => {
+    const isConnectedThroughPoints = path.points.some(point => point.connectedPOI === poi.id);
+    const hasNoStartPOI = !path.startPOI;
+    return isConnectedThroughPoints && hasNoStartPOI;
+  }) : [];
 
   useEffect(() => {
     if (isCreating) {
@@ -83,6 +100,23 @@ const POIEditPopup: React.FC = () => {
     } else if (e.key === 'Escape') {
       handleCancel();
     }
+  };
+
+  const handleSetStartPOI = (pathId: string) => {
+    if (!poi) return;
+    updatePath(pathId, { startPOI: poi.id });
+  };
+
+  const handleRemoveStartPOI = (pathId: string) => {
+    updatePath(pathId, { startPOI: undefined });
+  };
+
+  const getPathDisplayName = (path: PathSegment) => {
+    if (path.endPOI) {
+      const endPOI = tourData?.pois.find(p => p.id === path.endPOI);
+      return `Path to ${endPOI?.label || 'Unknown POI'}`;
+    }
+    return `Path ${path.id.slice(-8)}`;
   };
 
   return (
@@ -149,6 +183,58 @@ const POIEditPopup: React.FC = () => {
               </span>
             </label>
           </div>
+
+          {/* Path Management Section - only show for existing POIs */}
+          {!isCreating && poi && connectedPaths.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="flex items-center space-x-1">
+                  <Route size={16} />
+                  <span>Connected Paths</span>
+                </div>
+              </label>
+              <div className="space-y-2 max-h-32 overflow-y-auto">
+                {connectedPaths.map((path) => (
+                  <div key={path.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">
+                        {getPathDisplayName(path)}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {path.startPOI === poi.id ? 'Starts here' : path.endPOI === poi.id ? 'Ends here' : 'Connected'}
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0 ml-2">
+                      {path.startPOI === poi.id ? (
+                        <button
+                          onClick={() => handleRemoveStartPOI(path.id)}
+                          className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                          title="Remove as start POI"
+                        >
+                          Remove Start
+                        </button>
+                      ) : !path.startPOI ? (
+                        <button
+                          onClick={() => handleSetStartPOI(path.id)}
+                          className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                          title="Set as start POI for this path"
+                        >
+                          Set Start
+                        </button>
+                      ) : (
+                        <span className="text-xs text-gray-400">Has Start</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {availableStartPaths.length > 0 && (
+                <div className="mt-2 text-xs text-gray-600">
+                  Tip: Click "Set Start" to make this POI the starting point for interactive navigation
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="bg-gray-50 p-3 rounded-md">
             <div className="text-xs text-gray-500 space-y-1">

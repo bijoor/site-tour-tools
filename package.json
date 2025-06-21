@@ -4,18 +4,34 @@
   "private": true,
   "description": "Interactive site tour tools monorepo",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/tour-component/demo"
   ],
   "scripts": {
     "build": "npm run build --workspaces",
     "dev": "npm run dev --workspaces",
     "lint": "npm run lint --workspaces",
     "type-check": "npm run type-check --workspaces",
-    "clean": "npm run clean --workspaces"
+    "clean": "npm run clean --workspaces",
+    
+    "dev:drawing": "npm run dev --workspace=packages/drawing-tool",
+    "dev:tour": "npm run dev --workspace=tour-component-demo", 
+    "dev:tour-lib": "npm run dev --workspace=packages/tour-component",
+    "dev:all": "concurrently \"npm run dev:drawing\" \"npm run dev:tour\" --names \"drawing,tour\" --prefix-colors \"blue,green\"",
+    
+    "build:shared": "npm run build --workspace=packages/shared",
+    "build:component": "npm run build --workspace=packages/tour-component", 
+    "build:drawing": "npm run build --workspace=packages/drawing-tool",
+    "build:demo": "npm run build --workspace=tour-component-demo",
+    
+    "build:all": "npm run build:shared && npm run build:component && npm run build:drawing && npm run build:demo",
+    "deploy": "npm run build:all && npm run copy:docs",
+    "copy:docs": "cp -r packages/drawing-tool/dist/* docs/ && cp -r packages/tour-component/demo/dist/* docs/tour-player/"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "concurrently": "^8.2.2"
   },
   "engines": {
     "node": ">=18.0.0",

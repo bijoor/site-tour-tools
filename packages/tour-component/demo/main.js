@@ -200,22 +200,23 @@ function TourDemo() {
         );
     }
     
-    return React.createElement('div', { className: "tour-container" }, [
+    return React.createElement('div', { className: "tour-container flex flex-col h-screen" }, [
         React.createElement('div', { 
             key: 'header',
-            className: "bg-white border-b p-4 flex justify-between items-center" 
+            className: "bg-white border-b p-2 sm:p-3 flex items-center justify-between gap-2 flex-shrink-0",
+            style: { minHeight: '48px', position: 'relative', zIndex: 10 }
         }, [
             React.createElement('h1', { 
                 key: 'tour-title',
-                className: "text-xl font-bold" 
-            }, `Tour: ${tourData.name}`),
+                className: "text-sm sm:text-lg font-bold truncate flex-1 min-w-0" 
+            }, tourData.name),
             React.createElement('div', {
                 key: 'controls-section',
-                className: "flex items-center gap-4"
+                className: "flex items-center gap-1 sm:gap-3 flex-shrink-0"
             }, [
                 React.createElement('label', {
                     key: 'auto-follow-label',
-                    className: "flex items-center gap-2 text-sm"
+                    className: "flex items-center gap-1 text-xs sm:text-sm whitespace-nowrap"
                 }, [
                     React.createElement('input', {
                         key: 'auto-follow-checkbox',
@@ -227,19 +228,18 @@ function TourDemo() {
                     React.createElement('span', {
                         key: 'auto-follow-text',
                         className: "text-gray-700"
-                    }, 'Auto-Follow Camera')
+                    }, 'Auto Zoom')
                 ]),
                 React.createElement('button', {
                     key: 'back-btn',
                     onClick: () => setTourData(null),
-                    className: "px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                }, 'Load Different Tour')
+                    className: "px-2 py-1 sm:px-3 sm:py-2 bg-gray-500 text-white rounded hover:bg-gray-600 text-xs sm:text-sm whitespace-nowrap"
+                }, 'Load')
             ])
         ]),
         React.createElement('div', { 
             key: 'tour-wrapper',
-            className: "h-full relative",
-            style: { height: 'calc(100vh - 73px)' }
+            className: "flex-1 relative min-h-0 overflow-hidden"
         }, 
             React.createElement(TourComponent, {
                 tourData,

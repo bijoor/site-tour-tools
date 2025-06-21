@@ -64,9 +64,17 @@ const TourComponent: React.FC<TourComponentProps> = ({
 
   // Set tour data when component mounts or tourData changes
   useEffect(() => {
+    console.log('🚀 TourComponent: Loading tour data:', {
+      name: tourData.name,
+      autoStart,
+      settingsAutoStart: tourData.settings?.autoStart,
+      paths: tourData.paths.length,
+      pois: tourData.pois.length
+    });
     setTourData(tourData);
     
-    if (autoStart || tourData.settings.autoStart) {
+    if (autoStart || tourData.settings?.autoStart) {
+      console.log('🚀 TourComponent: Auto-starting tour');
       play();
     }
   }, [tourData, autoStart, setTourData, play]);
@@ -104,8 +112,8 @@ const TourComponent: React.FC<TourComponentProps> = ({
   if (isMobile) {
     // Mobile Layout: Canvas takes full space, panel overlays from bottom
     return (
-      <div className={`relative bg-gray-100 rounded-lg overflow-hidden ${className}`} style={{ height: '100vh', maxHeight: '100vh' }}>
-        {/* Main tour canvas - full viewport */}
+      <div className={`relative bg-gray-100 rounded-lg overflow-hidden ${className}`} style={{ height: '100%', width: '100%' }}>
+        {/* Main tour canvas - full available space */}
         <div className="absolute inset-0">
           <TourCanvas
             className="w-full h-full"
